@@ -1,0 +1,161 @@
+const fs = require('fs');
+const path = require('path');
+const Shop = require('../models/shop');
+const { validationResult, check } = require('express-validator');
+const mongoose = require('mongoose');
+
+exports.addShop = (req, res, next) => {
+  console.log(req.body);
+  const { name, description, owner, address, products, categories, city, cityId } = req.body;
+  let banner;
+  banner = path.join(__dirname, '..', req.files[0].path);
+  console.log(banner);
+  const shop = new Shop({
+    name,
+    description,
+    owner,
+    address,
+    products,
+    banner,
+    categories,
+    city,
+    cityId
+  });
+  shop
+    .save()
+    .then(result => {
+      console.log(result);
+      res.status(201).json({
+        message: 'Added Shop Successfully',
+        Shop: {
+          result,
+          request: {
+            type: 'GET',
+            url: 'http://localhost:8000/api/shop/' + result._id
+          }
+        }
+      });
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({
+        error: err
+      });
+    });
+};
+
+exports.updateShop = (req, res, next) => {
+  let banner;
+  const shopId = req.params.shopId;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const error = new Error('Validation failed, entered data is incorrect.');
+    error.statusCode = 422;
+    throw error;
+  }
+  const { name, description, owner, address, products, categories, city, cityId } = req.body;
+  console.log(req.files);
+  if (req.files[0].path) {
+    // update banner
+    banner = req.files[0].path;
+
+    Shop.findById(shopId).then(shop => {
+      console.log(Shop);
+      //clear image from server
+      clearImages(shop.banner);
+    });
+  }
+
+  let update = {
+    name,
+    description,
+    owner,
+    address,
+    products,
+    categories,
+    city,
+    banner,
+    cityId,
+    banner
+  };
+
+  Shop.findOneAndUpdate({ _id: shopId }, { $set: update }, { new: true }, (err, document) => {
+    if (err) {
+      return res.json('Error occurred while updating shop');
+    }
+    res.status(200).json({ message: 'shop updated!', shop: document });
+  });
+};
+
+const clearImages = filePath => {
+  fs.unlink(filePath, err => console.log(err));
+};
+
+exports.getShop = (req, res, next) => {
+  const id = req.params.shopId;
+  Shop.findById(id)
+    .exec()
+    .then(doc => {
+      console.log('From database', doc);
+      if (doc) {
+        res.status(200).json({
+          Shop: doc
+        });
+      } else {
+        res.status(404).json({ message: 'No valid entry found for provided ID' });
+      }
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({ error: err });
+    });
+};
+
+exports.getShops = (req, res, next) => {
+  if (req.params.cityId) {
+    const cityId = req.params.cityId;
+    const categories = mongoose.Types.ObjectId(req.params.categoryId);
+    // PAGINATION (30 SHOPS PER PAGE)
+    const currentPage = req.query.page || 1;
+    const perPage = 30;
+    let totalItems;
+    Shop.countDocuments({ cityId, categories }, function (err, result) {
+      if (err) {
+        console.log(err);
+      } else {
+        totalItems = result;
+      }
+    });
+    Shop.find({ cityId })
+      .skip((currentPage - 1) * perPage)
+      .limit(perPage)
+      .select('name description banner city')
+      .exec()
+      .then(docs => {
+        const response = {
+          totalCount: totalItems,
+          shops: docs.map(doc => {
+            return {
+              name: doc.name,
+              city: doc.city,
+              banner: doc.banner,
+              _id: doc._id,
+              request: {
+                type: 'GET',
+                url: 'http://localhost:8000/api/shop/' + doc._id
+              }
+            };
+          })
+        };
+        res.status(200).json(response);
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500).json({
+          error: err
+        });
+      });
+  } else {
+    res.send('No City Selected');
+  }
+};
