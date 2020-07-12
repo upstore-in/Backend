@@ -123,7 +123,7 @@ exports.signupEmail = (req, res) => {
     console.log(err);
     if (err) {
       return res.status(400).json({
-        err: 'NOT able to save user in DB'
+        err: 'NOT able to save user in DB try choosing a different email address'
       });
     }
     res.json({

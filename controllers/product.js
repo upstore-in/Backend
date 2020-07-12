@@ -37,6 +37,7 @@ exports.createProduct = (req, res, next) => {
           name: result.name,
           price: result.price,
           imagePaths: photos,
+          stock: result.stock,
           request: {
             type: 'GET',
             url: 'next url here'
@@ -194,7 +195,7 @@ exports.getProducts = (req, res, next) => {
     Product.find({ city, category })
       .skip((currentPage - 1) * perPage)
       .limit(perPage)
-      .select('title imageURL price')
+      .select('title price photos')
       .exec()
       .then(docs => {
         const response = {
@@ -227,7 +228,6 @@ exports.getProducts = (req, res, next) => {
 
 exports.updateStock = (req, res, next) => {
   let myOperations = req.body.order.products.map(prod => {
-    console.log(prod.stock);
     return {
       updateOne: {
         filter: { _id: prod._id },
@@ -235,7 +235,6 @@ exports.updateStock = (req, res, next) => {
       }
     };
   });
-  console.log(myOperations[0].updateOne.update);
 
   Product.bulkWrite(myOperations, {}, (err, products) => {
     if (err) {
@@ -245,4 +244,51 @@ exports.updateStock = (req, res, next) => {
     }
     next();
   });
+};
+
+exports.productsOfShop = (req, res, next) => {
+  const shopId = req.params.shopId;
+
+  // PAGINATION (30 PRODUCTS PER PAGE)
+  const currentPage = req.query.page || 1;
+  const perPage = 30;
+  let totalItems;
+
+  Product.countDocuments({ shopId }, function (err, result) {
+    if (err) {
+      console.log(err);
+    } else {
+      totalItems = result;
+    }
+  });
+
+  Product.find({ shopId })
+    .skip((currentPage - 1) * perPage)
+    .limit(perPage)
+    .select('name price photos')
+    .exec()
+    .then(docs => {
+      const response = {
+        totalCount: totalItems,
+        products: docs.map(doc => {
+          return {
+            name: doc.name,
+            price: doc.price,
+            images: doc.photos,
+            _id: doc._id,
+            request: {
+              type: 'GET',
+              url: 'insert url before param here' + doc._id
+            }
+          };
+        })
+      };
+      res.status(200).json(response);
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({
+        error: err
+      });
+    });
 };

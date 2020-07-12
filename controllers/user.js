@@ -1,5 +1,6 @@
-const User = require('../models/user');
 const Order = require('../models/order');
+
+const User = require('../models/user');
 
 exports.getUserById = (req, res, next, id) => {
   User.findById(id).exec((err, user) => {
@@ -49,19 +50,15 @@ exports.pushOrderInPurchaseList = (req, res, next) => {
   let purchases = [];
   req.body.order.products.forEach(product => {
     purchases.push({
-      _id: product._id,
+      _id: product.product,
       name: product.name,
-      shopName: product.shopName,
-      city: product.city,
-      description: product.description,
-      category: product.category,
       quantity: product.quantity,
-      amount: req.body.order.amount,
+      price: product.price,
       transaction_id: req.body.order.transaction_id
     });
   });
 
-  //store thi in DB
+  //store this in DB
   User.findOneAndUpdate({ _id: req.profile._id }, { $push: { purchases: purchases } }, { new: true, useFindAndModify: false }, (err, purchases) => {
     if (err) {
       return res.status(400).json({

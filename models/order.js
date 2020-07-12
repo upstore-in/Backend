@@ -7,7 +7,7 @@ const ProductCartSchema = new mongoose.Schema({
     ref: 'Product'
   },
   name: String,
-  count: Number,
+  quantity: Number,
   price: Number
 });
 

@@ -15,8 +15,10 @@ var userSchema = new mongoose.Schema(
       type: Number,
       trim: true,
       index: {
+        sparse: true,
         unique: true
-      }
+      },
+      default: null
     },
     lastname: {
       type: String,
@@ -34,6 +36,7 @@ var userSchema = new mongoose.Schema(
       type: String,
       trim: true,
       index: {
+        sparse: true,
         unique: true,
         partialFilterExpression: { email: { $type: 'string' } }
       }

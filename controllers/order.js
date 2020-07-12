@@ -2,7 +2,7 @@ const { Order, ProductCart } = require('../models/order');
 
 exports.getOrderById = (req, res, next, id) => {
   Order.findById(id)
-    .populate('products.product', 'name price')
+    .populate('products.product, name stock price')
     .exec((err, order) => {
       if (err) {
         return res.status(400).json({
@@ -23,19 +23,26 @@ exports.createOrder = (req, res) => {
         error: 'Failed to save your order in DB'
       });
     }
+    order.user.encry_password = undefined;
+    order.user.salt = undefined;
     res.json(order);
   });
 };
 
-exports.getAllOrders = (req, res) => {
-  Order.find()
+exports.getShopOrders = (req, res) => {
+  Order.find({})
     .populate('user', '_id name')
+    .populate('products.product')
     .exec((err, order) => {
       if (err) {
         return res.status(400).json({
           error: 'No orders found in DB'
         });
       }
+      ///////
+      // order.populate(' products.product ', 'price').execPopulate();
+      console.log(order);
+      ///////
       res.json(order);
     });
 };

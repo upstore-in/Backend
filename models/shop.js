@@ -23,12 +23,6 @@ const shopSchema = new mongoose.Schema(
       required: true,
       default: 'Address Here'
     },
-    products: [
-      {
-        type: ObjectId,
-        ref: 'Product'
-      }
-    ],
     description: {
       type: String,
       trim: true,
