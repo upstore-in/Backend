@@ -9,6 +9,7 @@ exports.getCategories = (req, res, next) => {
         categories: docs.map(doc => {
           return {
             name: doc.name,
+            imagePath: doc.image,
             _id: doc._id
           };
         })
@@ -24,16 +25,23 @@ exports.getCategories = (req, res, next) => {
 };
 
 exports.createCategory = (req, res, next) => {
-  const category = new Category(req.body);
+  console.log(req.body);
+  const { name } = req.body;
+  console.log(req.body);
+  let image;
+  image = req.files[0].path;
+  const category = new Category({
+    name,
+    image
+  });
   category
     .save()
     .then(result => {
       console.log(result);
       res.status(201).json({
-        message: 'Created category successfully',
-        createdCategory: {
-          name: result.name,
-          _id: result._id
+        message: 'Category created Successfully',
+        Category: {
+          result
         }
       });
     })

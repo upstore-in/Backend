@@ -8,7 +8,7 @@ exports.addShop = (req, res, next) => {
   console.log(req.body);
   const { name, description, owner, address, products, categories, city, cityId } = req.body;
   let banner;
-  banner = path.join(__dirname, '..', req.files[0].path);
+  banner = req.files[0].path;
   console.log(banner);
   const shop = new Shop({
     name,
@@ -54,15 +54,15 @@ exports.updateShop = (req, res, next) => {
     throw error;
   }
   const { name, description, owner, address, products, categories, city, cityId } = req.body;
-  console.log(req.files);
   if (req.files[0].path) {
     // update banner
     banner = req.files[0].path;
 
     Shop.findById(shopId).then(shop => {
       console.log(Shop);
+      let oldBanner = shop.banner;
       //clear image from server
-      clearImages(shop.banner);
+      clearImages(oldBanner);
     });
   }
 
@@ -88,6 +88,8 @@ exports.updateShop = (req, res, next) => {
 };
 
 const clearImages = filePath => {
+  console.log(filePath);
+  filePath = path.join(__dirname, '..', filePath);
   fs.unlink(filePath, err => console.log(err));
 };
 
