@@ -66,5 +66,6 @@ app.use('/api', cityRoutes);
 app.use('/api', shopRoutes);
 app.use('/api', userRoutes);
 app.use('/api', orderRoutes);
+app.use(express.static('images'));
 
 app.listen(8000);

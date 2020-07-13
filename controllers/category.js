@@ -1,6 +1,4 @@
 const Category = require('../models/category');
-const fs = require('fs');
-const path = require('path');
 
 exports.getCategories = (req, res, next) => {
   Category.find()
@@ -11,7 +9,7 @@ exports.getCategories = (req, res, next) => {
         categories: docs.map(doc => {
           return {
             name: doc.name,
-            imagePath: path.join(__dirname, '..', doc.image),
+            imagePath: doc.image,
             _id: doc._id
           };
         })
