@@ -1,4 +1,6 @@
 const Category = require('../models/category');
+const fs = require('fs');
+const path = require('path');
 
 exports.getCategories = (req, res, next) => {
   Category.find()
@@ -9,7 +11,7 @@ exports.getCategories = (req, res, next) => {
         categories: docs.map(doc => {
           return {
             name: doc.name,
-            imagePath: doc.image,
+            imagePath: path.join(__dirname, '..', doc.image),
             _id: doc._id
           };
         })
@@ -38,6 +40,7 @@ exports.createCategory = (req, res, next) => {
     .save()
     .then(result => {
       console.log(result);
+
       res.status(201).json({
         message: 'Category created Successfully',
         Category: {
