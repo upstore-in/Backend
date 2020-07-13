@@ -35,7 +35,7 @@ mongoose
 // MULTER STORAGE
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, './images');
+    cb(null, './public/images');
   },
   filename: (req, file, cb) => {
     cb(null, new Date().toISOString() + '-' + file.originalname);
@@ -66,6 +66,6 @@ app.use('/api', cityRoutes);
 app.use('/api', shopRoutes);
 app.use('/api', userRoutes);
 app.use('/api', orderRoutes);
-app.use(express.static('images'));
+app.use(express.static('public'));
 
 app.listen(8000);
