@@ -113,7 +113,7 @@ exports.updateProduct = (req, res, next) => {
     error.statusCode = 422;
     throw error;
   }
-  const { name, shopName, description, price, category, stock, sold, shopId } = req.body;
+  const { name, shopName, description, price, category, stock, sold, shopId, discount, size } = req.body;
 
   Product.findById(productId)
     .then(product => {
@@ -122,7 +122,6 @@ exports.updateProduct = (req, res, next) => {
         error.statusCode = 404;
         throw error;
       }
-      console.log(product.photos);
       const photos = product.photos;
       const _id = product._id;
       product.name = name;
@@ -134,8 +133,12 @@ exports.updateProduct = (req, res, next) => {
       product.sold = sold;
       product.shopId = shopId;
       product.discount = discount;
+      console.log(product.discount);
       product.size = size;
-      if (req.files.length > 0) {
+      console.log(product.size);
+      console.log(product);
+      console.log(req.files);
+      if (req.files) {
         let newPhotos = [];
         let i = 0;
         while (i < req.files.length) {
@@ -144,7 +147,7 @@ exports.updateProduct = (req, res, next) => {
           i++;
         }
         //clear image from server
-        clearImages(product.photos);
+        clearImages(photos);
 
         // udate photos
         product.photos = newPhotos;
