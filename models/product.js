@@ -35,6 +35,14 @@ const productSchema = new mongoose.Schema(
       ref: 'Category',
       required: true
     },
+    discount: {
+      type: String
+    },
+    size: [
+      {
+        type: String
+      }
+    ],
     city: {
       type: ObjectId,
       ref: 'City',

@@ -6,7 +6,7 @@ const Product = require('../models/product');
 
 exports.createProduct = (req, res, next) => {
   console.log(req.body);
-  const { name, shopName, description, price, stock, category, sold, city, shopId } = req.body;
+  const { name, shopName, description, price, stock, category, sold, city, shopId, discount, size } = req.body;
   let photos = [];
   let i = 0;
   while (i < req.files.length) {
@@ -24,7 +24,9 @@ exports.createProduct = (req, res, next) => {
     sold,
     city,
     photos,
-    shopId
+    shopId,
+    size,
+    discount
   });
   product
     .save()
@@ -33,14 +35,10 @@ exports.createProduct = (req, res, next) => {
       res.status(201).json({
         message: 'Created product successfully',
         createdProduct: {
-          _id: result._id,
-          name: result.name,
-          price: result.price,
-          imagePaths: photos,
-          stock: result.stock,
+          result,
           request: {
             type: 'GET',
-            url: 'next url here'
+            url: 'http://159.65.159.82:8000/api/product/' + result._id
           }
         }
       });
@@ -135,6 +133,8 @@ exports.updateProduct = (req, res, next) => {
       product.stock = stock;
       product.sold = sold;
       product.shopId = shopId;
+      product.discount = discount;
+      product.size = size;
       if (req.files.length > 0) {
         let newPhotos = [];
         let i = 0;
@@ -181,7 +181,7 @@ exports.getProducts = (req, res, next) => {
 
     // PAGINATION (30 PRODUCTS PER PAGE)
     const currentPage = req.query.page || 1;
-    const perPage = 30;
+    const perPage = 10;
     let totalItems;
 
     Product.countDocuments({ city, category }, function (err, result) {
@@ -205,10 +205,12 @@ exports.getProducts = (req, res, next) => {
               name: doc.name,
               price: doc.price,
               images: doc.photos,
+              size: doc.size,
+              discount: doc.discount,
               _id: doc._id,
               request: {
                 type: 'GET',
-                url: 'insert url before param here' + doc._id
+                url: 'http://159.65.159.82:8000/api/product/' + doc._id
               }
             };
           })
@@ -251,7 +253,7 @@ exports.productsOfShop = (req, res, next) => {
 
   // PAGINATION (30 PRODUCTS PER PAGE)
   const currentPage = req.query.page || 1;
-  const perPage = 30;
+  const perPage = 10;
   let totalItems;
 
   Product.countDocuments({ shopId }, function (err, result) {
@@ -265,7 +267,7 @@ exports.productsOfShop = (req, res, next) => {
   Product.find({ shopId })
     .skip((currentPage - 1) * perPage)
     .limit(perPage)
-    .select('name price photos')
+    .select('name price photos discount size')
     .exec()
     .then(docs => {
       const response = {
@@ -275,10 +277,12 @@ exports.productsOfShop = (req, res, next) => {
             name: doc.name,
             price: doc.price,
             images: doc.photos,
+            discount: doc.discount,
+            size: doc.size,
             _id: doc._id,
             request: {
               type: 'GET',
-              url: 'insert url before param here' + doc._id
+              url: 'http://159.65.159.82:8000/api/product/' + doc._id
             }
           };
         })

@@ -138,6 +138,7 @@ exports.signupEmail = (req, res) => {
 };
 
 exports.signinEmail = (req, res) => {
+  console.log('signed in');
   const errors = validationResult(req);
   const { email, password } = req.body;
 
