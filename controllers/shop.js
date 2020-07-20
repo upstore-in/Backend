@@ -113,7 +113,7 @@ exports.getShop = (req, res, next) => {
     });
 };
 
-exports.getShops = (req, res, next) => {
+exports.getShops = async (req, res, next) => {
   if (req.params.cityId) {
     const cityId = req.params.cityId;
     const categories = mongoose.Types.ObjectId(req.params.categoryId);
@@ -121,7 +121,7 @@ exports.getShops = (req, res, next) => {
     const currentPage = req.query.page || 1;
     const perPage = 30;
     let totalItems;
-    Shop.countDocuments({ cityId, categories }, function (err, result) {
+    await Shop.countDocuments({ cityId, categories }, function (err, result) {
       if (err) {
         console.log(err);
       } else {

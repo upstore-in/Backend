@@ -177,7 +177,7 @@ const clearImages = filePathArray => {
   }
 };
 
-exports.getProducts = (req, res, next) => {
+exports.getProducts = async (req, res, next) => {
   if (req.params.cityId) {
     const city = req.params.cityId;
     const category = req.params.categoryId;
@@ -187,7 +187,7 @@ exports.getProducts = (req, res, next) => {
     const perPage = 10;
     let totalItems;
 
-    Product.countDocuments({ city, category }, function (err, result) {
+    await Product.countDocuments({ city, category }, function (err, result) {
       if (err) {
         console.log(err);
       } else {
@@ -198,7 +198,7 @@ exports.getProducts = (req, res, next) => {
     Product.find({ city, category })
       .skip((currentPage - 1) * perPage)
       .limit(perPage)
-      .select('title price photos')
+      .select('name price photos size discount')
       .exec()
       .then(docs => {
         const response = {
@@ -251,7 +251,7 @@ exports.updateStock = (req, res, next) => {
   });
 };
 
-exports.productsOfShop = (req, res, next) => {
+exports.productsOfShop = async (req, res, next) => {
   const shopId = req.params.shopId;
 
   // PAGINATION (30 PRODUCTS PER PAGE)
@@ -259,7 +259,7 @@ exports.productsOfShop = (req, res, next) => {
   const perPage = 10;
   let totalItems;
 
-  Product.countDocuments({ shopId }, function (err, result) {
+  await Product.countDocuments({ shopId }, function (err, result) {
     if (err) {
       console.log(err);
     } else {
