@@ -39,10 +39,9 @@ exports.getShopOrders = (req, res) => {
           error: 'No orders found in DB'
         });
       }
-      ///////
-      // order.populate(' products.product ', 'price').execPopulate();
+
       console.log(order);
-      ///////
+
       res.json(order);
     });
 };
