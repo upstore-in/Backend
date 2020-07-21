@@ -6,10 +6,11 @@ exports.addToCart = async (req, res) => {
   try {
     if (cart) {
       products.forEach(prod => {
-        const { wishlist, product, quantity } = prod;
+        const { wishlist, product } = prod;
+        let quantity = prod.quantity;
         // Cart already exists for user and he/she wants to add product to Cart or wishlist
         let itemIndex = cart.products.findIndex(doc => doc.product == product);
-
+        console.log(cart.products.findIndex(doc => doc.product == product));
         if (itemIndex > -1) {
           console.log(itemIndex);
           //Product exists in the cart, update the quantity and/or wishlist status
@@ -19,7 +20,8 @@ exports.addToCart = async (req, res) => {
           cart.products[itemIndex] = productItem;
         } else {
           //product does not exists in cart, add new item
-          cart.products.push({ product, quantity });
+          if (wishlist) quantity = 1;
+          cart.products.push({ product, quantity, wishlist });
         }
       });
       cart
@@ -32,6 +34,9 @@ exports.addToCart = async (req, res) => {
         });
     } else {
       //no cart  for user, create new cart
+      await products.forEach(product => {
+        if (product.wishlist == 1) product.quantity = 1;
+      });
       Cart.create({
         userId,
         products
@@ -83,7 +88,8 @@ exports.removeFromCart = async (req, res) => {
   try {
     if (cart) {
       let itemIndex = await cart.products.findIndex(doc => doc.product == product);
-      cart.products.splice(itemIndex, 1);
+      console.log(itemIndex);
+      if (itemIndex !== -1) cart.products.splice(itemIndex, 1);
 
       cart
         .save()

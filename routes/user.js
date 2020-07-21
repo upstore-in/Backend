@@ -13,5 +13,5 @@ router.put('/user/:userId', isSignedIn, isAuthenticated, updateUser);
 router.post('/user/addToCart/:user_id', addToCart);
 router.get('/user/getCart/:user_id', getCart);
 router.get('/orders/user/:usersId', isSignedIn, isAuthenticated, userPurchaseList);
-router.delete('/cart/:product/:user_id', removeFromCart);
+router.delete('/cart/:productId/:user_id', removeFromCart);
 module.exports = router;
