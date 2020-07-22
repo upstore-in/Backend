@@ -21,6 +21,7 @@ exports.getUser = (req, res) => {
 };
 
 exports.updateUser = (req, res) => {
+  console.log(req.body);
   User.findByIdAndUpdate({ _id: req.profile._id }, { $set: req.body }, { new: true, useFindAndModify: false }, (err, user) => {
     if (err) {
       return res.status(400).json({

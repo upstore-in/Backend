@@ -131,6 +131,7 @@ exports.signupEmail = (req, res) => {
       user: {
         name: user.name,
         email: user.email,
+        phoneNumber,
         id: user._id
       }
     });
@@ -167,8 +168,8 @@ exports.signinEmail = (req, res) => {
     res.cookie('token', token, { expire: new Date() + 9999 });
 
     // send response to front end
-    const { _id, name, email, role } = user;
-    return res.json({ token, user: { _id, name, email, role } });
+    const { _id, name, email, role, phoneNumber } = user;
+    return res.json({ token, user: { _id, name, email, role, phoneNumber } });
   });
 };
 

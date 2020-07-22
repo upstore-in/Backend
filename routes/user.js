@@ -10,8 +10,8 @@ router.param('userId', getUserById);
 router.get('/user/:userId', isSignedIn, isAuthenticated, getUser);
 router.put('/user/:userId', isSignedIn, isAuthenticated, updateUser);
 // use /:user_id instead of /:userId to avoid getUserById middleware
-router.post('/user/addToCart/:user_id', addToCart);
-router.get('/user/getCart/:user_id', getCart);
+router.post('/user/addToCart/:user_id', isSignedIn, isAuthenticated, addToCart);
+router.get('/user/getCart/:user_id', isSignedIn, isAuthenticated, getCart);
 router.get('/orders/user/:usersId', isSignedIn, isAuthenticated, userPurchaseList);
-router.delete('/cart/:productId/:user_id', removeFromCart);
+router.delete('/cart/:productId/:user_id', isSignedIn, isAuthenticated, removeFromCart);
 module.exports = router;
