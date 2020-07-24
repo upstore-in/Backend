@@ -2,37 +2,38 @@ const User = require('../models/user');
 const { check, validationResult } = require('express-validator');
 var jwt = require('jsonwebtoken');
 var expressJwt = require('express-jwt');
+let messagebird = require('messagebird')('ooxiHPARPa60sBNrkGOU0rANF');
 
 exports.getPhoneNumber = (req, res, next) => {
-  var phoneNumber = req.body.phoneNumber;
-  console.log(phoneNumber);
-  res.send({
-    id: '0e06880aecd944b49e75911558bc1479',
-    message: 'Some Random Message'
-  });
+  let phoneNumber = req.body.phoneNumber;
+  // console.log(phoneNumber);
+  // res.send({
+  //   id: '0e06880aecd944b49e75911558bc1479',
+  //   message: 'Some Random Message'
+  // });
   /******* GENERATE VERIFY OBJECT IN PRODUCTION ******/
-  // messagebird.verify.create(
-  //   number,
-  //   {
-  //     originator: 'Code',
-  //     template: 'Your verification code is %token.',
-  //     timeout: 180
-  //   },
-  //   function (err, response) {
-  //     if (err) {
-  //       console.log(err);
-  //       res.send({
-  //         error: err.errors[0].description
-  //       });
-  //     } else {
-  //       console.log(response);
-  //       res.send({
-  //         id: response.id,
-  //         thankyou: 'thanks'
-  //       });
-  //     }
-  //   }
-  // );
+  messagebird.verify.create(
+    phoneNumber,
+    {
+      originator: 'Code',
+      template: 'Your verification code is %token.',
+      timeout: 180
+    },
+    function (err, response) {
+      if (err) {
+        console.log(err);
+        res.send({
+          error: err.errors[0].description
+        });
+      } else {
+        console.log(response);
+        res.send({
+          id: response.id,
+          thankyou: 'thanks'
+        });
+      }
+    }
+  );
 };
 
 exports.verifyOTP = (req, res, next) => {
@@ -44,52 +45,59 @@ exports.verifyOTP = (req, res, next) => {
     });
   }
 
-  let messageId = req.body.id;
-  let token = 5662;
-  let phoneNumber = req.body.phoneNumber;
-  if (token == req.body.token && messageId == '0e06880aecd944b49e75911558bc1479') {
-    User.findOne({ phoneNumber }, (err, user) => {
-      if (err) {
-        // Set proper status code later
-        return res.status(422).json('Error Ocurrer in finding user');
-      }
+  let id = req.body.id;
+  var token = req.body.token;
+  messagebird.verify.verify(id, token, function (err, response) {
+    if (err) {
+      console.log(err);
+      res.send({
+        error: err.errors[0].description,
+        id: id
+      });
+    } else {
+      let phoneNumber = req.body.phoneNumber;
 
-      if (!user) {
-        let phoneNumber = req.body.phoneNumber;
-        const user = new User({ phoneNumber });
+      User.findOne({ phoneNumber }, (err, user) => {
+        if (err) {
+          // Set proper status code later
+          return res.status(422).json('Error Ocurrer in finding user');
+        }
 
-        user.save((err, user) => {
-          if (err) {
-            return res.status(400).json({
-              err: 'NOT able to save user in DB'
-            });
-          }
-        });
+        if (!user) {
+          let phoneNumber = req.body.phoneNumber;
+          const user = new User({ phoneNumber });
 
-        // create token
-        const token = jwt.sign({ _id: user._id }, process.env.SECRET);
-        //put token in cookie
-        res.cookie('token', token, { expire: new Date() + 9999 });
+          user.save((err, user) => {
+            if (err) {
+              return res.status(400).json({
+                err: 'NOT able to save user in DB'
+              });
+            }
+          });
 
-        // send response to front end
-        const { _id, name, email, role } = user;
-        return res.json({ token, user: { _id, phoneNumber, name, email, role } });
-      }
+          // create token
+          const token = jwt.sign({ _id: user._id }, process.env.SECRET);
+          //put token in cookie
+          res.cookie('token', token, { expire: new Date() + 9999 });
 
-      if (user) {
-        // create token
-        const token = jwt.sign({ _id: user._id }, process.env.SECRET);
-        //put token in cookie
-        res.cookie('token', token, { expire: new Date() + 9999 });
+          // send response to front end
+          const { _id, name, email, role } = user;
+          return res.json({ token, user: { _id, phoneNumber, name, email, role } });
+        }
 
-        // send response to front end
-        const { _id, name, email, role } = user;
-        return res.json({ token, user: { _id, name, email, role } });
-      }
-    });
-  } else {
-    return res.json('Incorrect Id/Token ');
-  }
+        if (user) {
+          // create token
+          const token = jwt.sign({ _id: user._id }, process.env.SECRET);
+          //put token in cookie
+          res.cookie('token', token, { expire: new Date() + 9999 });
+
+          // send response to front end
+          const { _id, name, email, role } = user;
+          return res.json({ token, user: { _id, name, email, role } });
+        }
+      });
+    }
+  });
 
   /********  VERIFY OTP IN PRODUCTION ******/
   // var id = req.body.id;

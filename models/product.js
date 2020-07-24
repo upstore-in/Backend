@@ -36,7 +36,7 @@ const productSchema = new mongoose.Schema(
       required: true
     },
     discount: {
-      type: String
+      type: Number
     },
     size: [
       {

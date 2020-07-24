@@ -1,4 +1,4 @@
-const Order = require('../models/order');
+const { Order } = require('../models/order');
 
 const User = require('../models/user');
 
@@ -35,8 +35,10 @@ exports.updateUser = (req, res) => {
 };
 
 exports.userPurchaseList = (req, res) => {
+  console.log(req.profile._id);
   Order.find({ user: req.profile._id })
     .populate('User', '_id name')
+    .populate('products.product', '-description -sold -createdAt -updatedAt -__v')
     .exec((err, order) => {
       if (err) {
         return res.status(400).json({

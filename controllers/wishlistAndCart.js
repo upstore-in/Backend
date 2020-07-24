@@ -27,7 +27,18 @@ exports.addToCart = async (req, res) => {
       cart
         .save()
         .then(cart => {
-          return res.status(201).send(cart);
+          console.log(cart);
+          Cart.findOne({ userId })
+            .populate('products.product', '-description -sold -createdAt -updatedAt -__v')
+            .exec((err, cart) => {
+              if (err) {
+                return res.status(400).json({
+                  error: 'NO cart found in DB'
+                });
+              }
+
+              return res.status(201).send(cart);
+            });
         })
         .catch(err => {
           console.log(err);
@@ -42,7 +53,18 @@ exports.addToCart = async (req, res) => {
         products
       })
         .then(newCart => {
-          return res.status(201).send(newCart);
+          console.log(newCart);
+          Cart.findOne({ userId })
+            .populate('products.product', '-description -sold -createdAt -updatedAt -__v')
+            .exec((err, cart) => {
+              if (err) {
+                return res.status(400).json({
+                  error: 'NO cart found in DB'
+                });
+              }
+
+              return res.status(201).send(cart);
+            });
         })
         .catch(err => {
           console.log(err);
@@ -55,7 +77,7 @@ exports.addToCart = async (req, res) => {
 };
 
 exports.getCart = async (req, res) => {
-  const userId = req.params.user_id;
+  const userId = req.params.userId;
   let newProducts = [];
   const wishlist = req.query.wishlist || 0;
   try {
@@ -66,12 +88,15 @@ exports.getCart = async (req, res) => {
           return res.status(400).json({
             error: 'NO cart found in DB'
           });
+        } else if (!cart) {
+          return res.status(400).json([]);
+        } else {
+          cart.products.forEach(product => {
+            console.log(product.wishlist);
+            product.wishlist == wishlist ? newProducts.push(product) : '';
+          });
+          return res.status(201).send(newProducts);
         }
-        cart.products.forEach(product => {
-          console.log(product.wishlist);
-          product.wishlist == wishlist ? newProducts.push(product) : '';
-        });
-        return res.status(201).send(newProducts);
       });
   } catch {
     err => {
@@ -82,7 +107,7 @@ exports.getCart = async (req, res) => {
 };
 
 exports.removeFromCart = async (req, res) => {
-  const userId = req.params.user_id;
+  const userId = req.params.userId;
   const product = req.params.productId;
   let cart = await Cart.findOne({ userId });
   try {
