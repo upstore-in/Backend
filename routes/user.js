@@ -9,7 +9,6 @@ router.param('userId', getUserById);
 
 router.get('/user/:userId', isSignedIn, isAuthenticated, getUser);
 router.put('/user/:userId', isSignedIn, isAuthenticated, updateUser);
-// use /:user_id instead of /:userId to avoid getUserById middleware
 router.post('/user/addToCart/:userId', isSignedIn, isAuthenticated, addToCart);
 router.get('/user/getCart/:userId', isSignedIn, isAuthenticated, getCart);
 router.get('/orders/user/:userId', isSignedIn, isAuthenticated, userPurchaseList);

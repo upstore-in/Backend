@@ -89,7 +89,8 @@ exports.getCart = async (req, res) => {
             error: 'NO cart found in DB'
           });
         } else if (!cart) {
-          return res.status(400).json([]);
+          console.log(cart);
+          return res.status(200).json([]);
         } else {
           cart.products.forEach(product => {
             console.log(product.wishlist);
