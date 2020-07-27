@@ -3,7 +3,7 @@ var router = express.Router();
 
 const { check, validationResult } = require('express-validator');
 const { isSignedIn, isAdmin, isAuthenticated } = require('../controllers/auth');
-const { createProduct, deleteProduct, getProductById, updateProduct, getProduct, getProducts, productsOfShop } = require('../controllers/product');
+const { createProduct, deleteProduct, getProductById, updateProduct, getProduct, getProducts, productsOfShop, listBySearch } = require('../controllers/product');
 const { getUserById } = require('../controllers/user');
 
 //all of params
@@ -15,6 +15,8 @@ router.delete('/product/:productId/:userId', isSignedIn, isAuthenticated, isAdmi
 router.get('/products/:categoryId/:cityId', getProducts);
 router.get('/product/:productId', getProduct);
 router.get('/products/:shopId', productsOfShop);
+router.get('/search/products/:cityId', listBySearch);
+
 // Update Product
 router.put('/product/update/:productId/:userId', isSignedIn, isAuthenticated, isAdmin, updateProduct);
 

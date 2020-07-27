@@ -1,5 +1,7 @@
 const fs = require('fs');
 const path = require('path');
+const mongoose = require('mongoose');
+const { ObjectId } = mongoose.Schema;
 
 const { validationResult, check } = require('express-validator');
 const Product = require('../models/product');
@@ -298,4 +300,33 @@ exports.productsOfShop = async (req, res, next) => {
         error: err
       });
     });
+};
+
+exports.listBySearch = async (req, res) => {
+  const query = {};
+  const currentPage = req.query.page || 1;
+  const perPage = 2;
+  let totalCount;
+
+  if (req.query.search) {
+    query.name = { $regex: req.query.search, $options: 'i' };
+    query.city = req.params.cityId;
+
+    await Product.countDocuments(query, function (err, result) {
+      if (err) {
+        console.log(err);
+      } else {
+        totalCount = result;
+      }
+    });
+
+    Product.find(query)
+      .skip((currentPage - 1) * perPage)
+      .limit(perPage)
+      .then(products => {
+        return res.status(200).send({ totalCount, products });
+      });
+  } else {
+    return res.status(400).send('Search query cannot be empty');
+  }
 };
