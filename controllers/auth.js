@@ -2,38 +2,36 @@ const User = require('../models/user');
 const { check, validationResult } = require('express-validator');
 var jwt = require('jsonwebtoken');
 var expressJwt = require('express-jwt');
-let messagebird = require('messagebird')('KZx7kqfPDP5GTejIkZ2Osl373');
+const https = require('https');
 
 exports.getPhoneNumber = (req, res, next) => {
   let phoneNumber = req.body.phoneNumber;
-  // console.log(phoneNumber);
-  // res.send({
-  //   id: '0e06880aecd944b49e75911558bc1479',
-  //   message: 'Some Random Message'
-  // });
-  /******* GENERATE VERIFY OBJECT IN PRODUCTION ******/
-  messagebird.verify.create(
-    phoneNumber,
-    {
-      originator: 'Code',
-      template: 'Your verification code is %token.',
-      timeout: 180
-    },
-    function (err, response) {
-      if (err) {
-        console.log(err);
-        res.send({
-          error: err.errors[0].description
+
+  /************************************** */
+  https
+    .get(`https://2factor.in/API/V1/${process.env.OTPAPIKEY}/SMS/+91${phoneNumber}/AUTOGEN`, resp => {
+      let data = '';
+
+      // A chunk of data has been recieved.
+      resp.on('data', chunk => {
+        data += chunk;
+      });
+
+      // The whole response has been received. Print out the result.
+      resp.on('end', () => {
+        console.log(data);
+        console.log(JSON.parse(data));
+        const session_id = JSON.parse(data).Details;
+        return res.status(200).send({
+          session_id,
+          phoneNumber
         });
-      } else {
-        console.log(response);
-        res.send({
-          id: response.id,
-          thankyou: 'thanks'
-        });
-      }
-    }
-  );
+      });
+    })
+    .on('error', err => {
+      console.log('Error: ' + err.message);
+    });
+  /******************************* */
 };
 
 exports.verifyOTP = (req, res, next) => {
@@ -44,76 +42,79 @@ exports.verifyOTP = (req, res, next) => {
       error: errors.array()[0].msg
     });
   }
+  const session_id = req.body.session_id;
+  const OTP = req.body.OTP;
 
-  let id = req.body.id;
-  var token = req.body.token;
-  messagebird.verify.verify(id, token, function (err, response) {
-    if (err) {
-      console.log(err);
-      res.send({
-        error: err.errors[0].description,
-        id: id
+  const phoneNumber = req.body.phoneNumber;
+
+  /************************************** */
+  https
+    .get(`https://2factor.in/API/V1/${process.env.OTPAPIKEY}/SMS/VERIFY/${session_id}/${OTP}`, resp => {
+      let data = '';
+
+      // A chunk of data has been recieved.
+      resp.on('data', chunk => {
+        data += chunk;
       });
-    } else {
-      let phoneNumber = req.body.phoneNumber;
 
-      User.findOne({ phoneNumber }, (err, user) => {
-        if (err) {
-          // Set proper status code later
-          return res.status(422).json('Error Ocurrer in finding user');
-        }
+      // The whole response has been received. Print out the result.
+      resp.on('end', () => {
+        console.log(data);
+        console.log(JSON.parse(data));
 
-        if (!user) {
-          let phoneNumber = req.body.phoneNumber;
-          const user = new User({ phoneNumber });
+        const { Details, Status } = JSON.parse(data);
 
-          user.save((err, user) => {
+        if (Details === 'OTP Matched') {
+          User.findOne({ phoneNumber }, (err, user) => {
             if (err) {
-              return res.status(400).json({
-                err: 'NOT able to save user in DB'
+              // Set proper status code later
+              return res.status(422).json('Error Ocurrer in finding user');
+            }
+
+            if (!user) {
+              let phoneNumber = req.body.phoneNumber;
+              const user = new User({ phoneNumber });
+
+              user.save((err, user) => {
+                if (err) {
+                  return res.status(400).json({
+                    err: 'NOT able to save user in DB'
+                  });
+                }
               });
+
+              // create token
+              const token = jwt.sign({ _id: user._id }, process.env.SECRET);
+              //put token in cookie
+              res.cookie('token', token, { expire: new Date() + 9999 });
+
+              // send response to front end
+              const { _id, name, email, role } = user;
+              return res.json({ token, user: { _id, phoneNumber, name, email, role } });
+            }
+
+            if (user) {
+              // create token
+              const token = jwt.sign({ _id: user._id }, process.env.SECRET);
+              //put token in cookie
+              res.cookie('token', token, { expire: new Date() + 9999 });
+
+              // send response to front end
+              const { _id, name, email, role } = user;
+              return res.json({ token, user: { _id, name, email, role } });
             }
           });
-
-          // create token
-          const token = jwt.sign({ _id: user._id }, process.env.SECRET);
-          //put token in cookie
-          res.cookie('token', token, { expire: new Date() + 9999 });
-
-          // send response to front end
-          const { _id, name, email, role } = user;
-          return res.json({ token, user: { _id, phoneNumber, name, email, role } });
-        }
-
-        if (user) {
-          // create token
-          const token = jwt.sign({ _id: user._id }, process.env.SECRET);
-          //put token in cookie
-          res.cookie('token', token, { expire: new Date() + 9999 });
-
-          // send response to front end
-          const { _id, name, email, role } = user;
-          return res.json({ token, user: { _id, name, email, role } });
+        } else if (Details === 'OTP Mismatch') {
+          return res.send('Incorrect OTP entered');
+        } else {
+          res.send(`Error Occurred. Details:${Details}`);
         }
       });
-    }
-  });
-
-  /********  VERIFY OTP IN PRODUCTION ******/
-  // var id = req.body.id;
-  // var token = req.body.token;
-  // messagebird.verify.verify(id, token, function (err, response) {
-  //   if (err) {
-  //     console.log(err);
-  //     res.send({
-  //       error: err.errors[0].description,
-  //       id: id
-  //     });
-  //   } else {
-  //     console.log(response);
-  //     res.send('verified');
-  //   }
-  // });
+    })
+    .on('error', err => {
+      console.log('Error: ' + err.message);
+    });
+  /******************************* */
 };
 
 exports.signupEmail = (req, res) => {
