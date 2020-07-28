@@ -30,13 +30,16 @@ const productSchema = new mongoose.Schema(
       maxlength: 32,
       trim: true
     },
+    markedPrice: {
+      type: Number,
+      required: true,
+      maxlength: 32,
+      trim: true
+    },
     category: {
       type: ObjectId,
       ref: 'Category',
       required: true
-    },
-    discount: {
-      type: Number
     },
     size: [
       {

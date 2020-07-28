@@ -2,7 +2,7 @@ const User = require('../models/user');
 const { check, validationResult } = require('express-validator');
 var jwt = require('jsonwebtoken');
 var expressJwt = require('express-jwt');
-let messagebird = require('messagebird')('ooxiHPARPa60sBNrkGOU0rANF');
+let messagebird = require('messagebird')('KZx7kqfPDP5GTejIkZ2Osl373');
 
 exports.getPhoneNumber = (req, res, next) => {
   let phoneNumber = req.body.phoneNumber;

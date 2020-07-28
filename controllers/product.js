@@ -8,7 +8,7 @@ const Product = require('../models/product');
 
 exports.createProduct = (req, res, next) => {
   console.log(req.body);
-  const { name, shopName, description, price, stock, category, sold, city, shopId, discount, size } = req.body;
+  const { name, shopName, description, price, stock, category, sold, city, shopId, markedPrice, size } = req.body;
   let photos = [];
   let i = 0;
   while (i < req.files.length) {
@@ -28,7 +28,7 @@ exports.createProduct = (req, res, next) => {
     photos,
     shopId,
     size,
-    discount
+    markedPrice
   });
   product
     .save()
@@ -115,7 +115,7 @@ exports.updateProduct = (req, res, next) => {
     error.statusCode = 422;
     throw error;
   }
-  const { name, shopName, description, price, category, stock, sold, shopId, discount, size } = req.body;
+  const { name, shopName, description, price, category, stock, sold, shopId, markedPrice, size } = req.body;
 
   Product.findById(productId)
     .then(product => {
@@ -134,8 +134,8 @@ exports.updateProduct = (req, res, next) => {
       product.stock = stock;
       product.sold = sold;
       product.shopId = shopId;
-      product.discount = discount;
-      console.log(product.discount);
+      product.markedPrice = markedPrice;
+      console.log(product.markedPrice);
       product.size = size;
       console.log(product.size);
       console.log(product);
@@ -200,7 +200,7 @@ exports.getProducts = async (req, res, next) => {
     Product.find({ city, category })
       .skip((currentPage - 1) * perPage)
       .limit(perPage)
-      .select('name price photos size discount')
+      .select('name price photos size markedPrice')
       .exec()
       .then(docs => {
         const response = {
@@ -211,7 +211,7 @@ exports.getProducts = async (req, res, next) => {
               price: doc.price,
               images: doc.photos,
               size: doc.size,
-              discount: doc.discount,
+              markedPrice: doc.markedPrice,
               _id: doc._id,
               request: {
                 type: 'GET',
@@ -272,7 +272,7 @@ exports.productsOfShop = async (req, res, next) => {
   Product.find({ shopId })
     .skip((currentPage - 1) * perPage)
     .limit(perPage)
-    .select('name price photos discount size')
+    .select('name price photos markedPrice size')
     .exec()
     .then(docs => {
       const response = {
@@ -282,7 +282,7 @@ exports.productsOfShop = async (req, res, next) => {
             name: doc.name,
             price: doc.price,
             images: doc.photos,
-            discount: doc.discount,
+            markedPrice: doc.markedPrice,
             size: doc.size,
             _id: doc._id,
             request: {
