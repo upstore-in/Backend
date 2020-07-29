@@ -209,7 +209,7 @@ exports.getProducts = async (req, res, next) => {
             return {
               name: doc.name,
               price: doc.price,
-              images: doc.photos,
+              photos: doc.photos,
               size: doc.size,
               markedPrice: doc.markedPrice,
               _id: doc._id,
@@ -281,7 +281,7 @@ exports.productsOfShop = async (req, res, next) => {
           return {
             name: doc.name,
             price: doc.price,
-            images: doc.photos,
+            photos: doc.photos,
             markedPrice: doc.markedPrice,
             size: doc.size,
             _id: doc._id,
