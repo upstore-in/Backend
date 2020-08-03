@@ -200,7 +200,7 @@ exports.getProducts = async (req, res, next) => {
     Product.find({ city, category })
       .skip((currentPage - 1) * perPage)
       .limit(perPage)
-      .select('name price photos size markedPrice')
+      .select('name price photos size markedPrice shopName description')
       .exec()
       .then(docs => {
         const response = {
@@ -209,8 +209,10 @@ exports.getProducts = async (req, res, next) => {
             return {
               name: doc.name,
               price: doc.price,
+              shopName: doc.shopName,
               photos: doc.photos,
               size: doc.size,
+              description: doc.description,
               markedPrice: doc.markedPrice,
               _id: doc._id,
               request: {
@@ -235,6 +237,7 @@ exports.getProducts = async (req, res, next) => {
 
 exports.updateStock = (req, res, next) => {
   let myOperations = req.body.order.products.map(prod => {
+    console.log(prod.quantity);
     return {
       updateOne: {
         filter: { _id: prod._id },
@@ -245,6 +248,7 @@ exports.updateStock = (req, res, next) => {
 
   Product.bulkWrite(myOperations, {}, (err, products) => {
     if (err) {
+      console.log(err);
       return res.status(400).json({
         error: 'Bulk operation failed'
       });
@@ -330,3 +334,46 @@ exports.listBySearch = async (req, res) => {
     return res.status(400).send('Search query cannot be empty');
   }
 };
+
+// exports.listBySearch = async (req, res) => {
+//   const query = {};
+//   const currentPage = req.query.page || 1;
+//   const perPage = 10;
+//   let totalCount;
+//   console.log(req.query.search);
+//   // if (req.query.search) {
+//   let order = req.query.order ? req.query.order : 1;
+//   let sortBy = req.query.sortBy ? req.query.sortBy : '_id';
+//   // if (req.query.search !== undefined) {
+//   //   query.name = { $regex: req.query.search, $options: 'i' };
+//   // }
+//   if (req.query.category) query.category = req.query.category;
+
+//   query.city = req.params.cityId;
+//   console.log(query.city);
+//   // gte -  greater than price [0-10]
+//   // lte - less than
+//   if (req.query.price)
+//     query.price = {
+//       $gte: req.query.price[0],
+//       $lte: req.query.price[1]
+//     };
+
+//   console.log(query);
+//   await Product.countDocuments(query, function (err, result) {
+//     if (err) {
+//       console.log(err);
+//     } else {
+//       totalCount = result;
+//     }
+//   });
+
+//   Product.find(query)
+//     // .sort([[sortBy, order]])
+//     .skip((currentPage - 1) * perPage)
+//     .limit(perPage)
+//     .then(products => {
+//       return res.status(200).send({ totalCount, products });
+//     });
+//   //}
+// };

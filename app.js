@@ -6,7 +6,6 @@ const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
-let messagebird = require('messagebird')('Md7LLaFTxDeyKS7BNOcP4RQTy');
 
 // app
 const app = express();
@@ -19,6 +18,7 @@ const cityRoutes = require('./routes/city');
 const userRoutes = require('./routes/user');
 const orderRoutes = require('./routes/order');
 const shopRoutes = require('./routes/shop');
+const paymentRoutes = require('./routes/payment');
 
 // DB Connection
 mongoose
@@ -65,6 +65,7 @@ app.use('/api', categoryRoutes);
 app.use('/api', cityRoutes);
 app.use('/api', shopRoutes);
 app.use('/api', userRoutes);
+app.use('/api', paymentRoutes);
 app.use('/api', orderRoutes);
 app.use(express.static('public'));
 
