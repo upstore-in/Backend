@@ -25,11 +25,26 @@ var userSchema = new mongoose.Schema(
       maxlength: 32,
       trim: true
     },
-    adresses: [
+    addresses: [
+      // {
+      //   type: String,
+      //   maxlength: 400,
+      //   trim: true
+      // }
       {
-        type: String,
-        maxlength: 400,
-        trim: true
+        contactName: {
+          type: String,
+          maxlength: 32,
+          trim: true
+        },
+        contactNumber: {
+          type: Number,
+          trim: true
+        },
+        address: {
+          type: String,
+          trim: true
+        }
       }
     ],
     email: {

@@ -6,8 +6,7 @@ const productSchema = new mongoose.Schema(
     name: {
       type: String,
       trim: true,
-      required: true,
-      maxlength: 32
+      required: true
     },
     shopId: {
       type: ObjectId,
@@ -61,7 +60,8 @@ const productSchema = new mongoose.Schema(
     },
     photos: [
       {
-        type: String
+        type: String,
+        required: true
       }
     ]
   },
