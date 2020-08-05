@@ -29,6 +29,7 @@ exports.verification = (req, res, next) => {
 };
 
 exports.razorpay = async (req, res, next) => {
+  console.log(req.body);
   const payment_capture = 1;
   const amount = 499;
   const currency = 'INR';

@@ -29,13 +29,15 @@ module.exports = router;
 //                 "product":"5eff91026215e43754fc14dc",
 //                 "name":"Adidas T Shirt",
 //                 "price":1000,
-//                 "quantity":1
+//                 "quantity":1,
+//                  "size":" "
 //             },
 //             {
 //                 "product":"5f00235ba483a839974800be",
 //                 "name":"Nike Shoes",
 //                 "price":1000,
-//                 "quantity":2
+//                 "quantity":2,
+//                  "size":" "
 //             }
 //         ],
 //         "transaction_id":150,

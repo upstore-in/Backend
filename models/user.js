@@ -26,11 +26,6 @@ var userSchema = new mongoose.Schema(
       trim: true
     },
     addresses: [
-      // {
-      //   type: String,
-      //   maxlength: 400,
-      //   trim: true
-      // }
       {
         contactName: {
           type: String,
@@ -44,6 +39,10 @@ var userSchema = new mongoose.Schema(
         address: {
           type: String,
           trim: true
+        },
+        default: {
+          type: Boolean,
+          default: false
         }
       }
     ],

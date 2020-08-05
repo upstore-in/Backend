@@ -8,7 +8,8 @@ const ProductCartSchema = new mongoose.Schema({
   },
   name: String,
   quantity: Number,
-  price: Number
+  price: Number,
+  size: String
 });
 
 const ProductCart = mongoose.model('ProductCart', ProductCartSchema);

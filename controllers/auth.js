@@ -140,7 +140,7 @@ exports.signupEmail = (req, res) => {
       user: {
         name: user.name,
         email: user.email,
-        phoneNumber,
+
         id: user._id
       }
     });
