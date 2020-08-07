@@ -238,9 +238,10 @@ exports.getProducts = async (req, res, next) => {
 exports.updateStock = (req, res, next) => {
   let myOperations = req.body.order.products.map(prod => {
     console.log(prod.quantity);
+
     return {
       updateOne: {
-        filter: { _id: prod._id },
+        filter: { _id: prod.product },
         update: { $inc: { stock: -prod.quantity, sold: +prod.quantity } }
       }
     };
@@ -253,6 +254,7 @@ exports.updateStock = (req, res, next) => {
         error: 'Bulk operation failed'
       });
     }
+    console.log(products);
     next();
   });
 };

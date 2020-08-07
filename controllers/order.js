@@ -51,7 +51,7 @@ exports.getOrderStatus = (req, res) => {
 };
 
 exports.updateStatus = (req, res) => {
-  Order.update({ _id: req.body.orderId }, { $set: { status: req.body.status } }, (err, order) => {
+  Order.update({ _id: req.params.orderId }, { $set: { status: req.body.status } }, (err, order) => {
     if (err) {
       return res.status(400).json({
         error: 'Cannot update order status'

@@ -3,9 +3,13 @@ var router = express.Router();
 
 const { isSignedIn, isAuthenticated } = require('../controllers/auth');
 const { verification, razorpay } = require('../controllers/razor');
+const { getUserById, pushOrderInPurchaseList } = require('../controllers/user');
+const { updateStock } = require('../controllers/product');
 
-router.post('/verification', verification);
+router.param('userId', getUserById);
 
-router.post('/razorpay', razorpay);
+router.post('/verification/:useId', verification);
+
+router.post('/razorpay/:userId', isSignedIn, isAuthenticated, pushOrderInPurchaseList, updateStock, razorpay);
 
 module.exports = router;

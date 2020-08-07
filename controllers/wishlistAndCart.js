@@ -133,3 +133,27 @@ exports.removeFromCart = async (req, res) => {
     };
   }
 };
+
+exports.clearCart = async (req, res, next) => {
+  const userId = req.params.userId;
+  let cart = await Cart.findOne({ userId });
+
+  try {
+    if (cart) {
+      cart.products = cart.products.filter(product => product.wishlist === 1);
+      cart
+        .save()
+        .then(cart => {
+          return res.status(201).send(cart);
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    } else return res.status(404).send('No such cart/user exists');
+  } catch {
+    err => {
+      console.log(err);
+      return res.status(404).send('Something went wrong');
+    };
+  }
+};
