@@ -6,13 +6,14 @@ const { isSignedIn, isAdmin, isAuthenticated } = require('../controllers/auth');
 const { getUserById } = require('../controllers/user');
 const { addShop, updateShop, getShop, getShops } = require('../controllers/shop');
 const { productsOfShop } = require('../controllers/product');
+const { upload } = require('../controllers/multer');
 
 //all of params
 router.param('userId', getUserById);
 
-router.post('/shop/add/:userId', isSignedIn, isAuthenticated, isAdmin, addShop);
+router.post('/shop/add/:userId', isSignedIn, isAuthenticated, isAdmin, upload.array('images', 4), addShop);
 // Update Shop Details
-router.put('/shop/update/:userId/:shopId', isSignedIn, isAuthenticated, isAdmin, updateShop);
+router.put('/shop/update/:userId/:shopId', isSignedIn, isAuthenticated, isAdmin, upload.array('images', 4), updateShop);
 router.get('/shops/:categoryId/:cityId', getShops);
 router.get('/shop/products/:shopId', productsOfShop);
 

@@ -311,7 +311,7 @@ exports.productsOfShop = async (req, res, next) => {
 exports.listBySearch = async (req, res) => {
   const query = {};
   const currentPage = req.query.page || 1;
-  const perPage = 2;
+  const perPage = 10;
   let totalCount;
 
   if (req.query.search) {

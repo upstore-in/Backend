@@ -32,35 +32,16 @@ mongoose
     console.log('DB CONNECTED');
   });
 
-// MULTER STORAGE
-const fileStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, './public/images');
-  },
-  filename: (req, file, cb) => {
-    cb(null, new Date().toISOString() + '-' + file.originalname);
-  }
-});
-
-// MULTER FILTERING MIME TYPE
-const fileFilter = (req, file, cb) => {
-  if (file.mimetype === 'image/png' || file.mimetype === 'image/jpg' || file.mimetype === 'image/jpeg' || file.mimetype === 'image/svg+xml') {
-    cb(null, true);
-  } else {
-    cb(null, false);
-  }
-};
-
 // Middlewares
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(cors());
-const upload = multer({ storage: fileStorage, limits: { fileSize: 10000000 }, fileFilter: fileFilter });
+
 app.use('./images', express.static(path.join(__dirname, 'images')));
 
 // Routes
 app.use('/api', authRoutes);
-app.use('/api', upload.array('images', 8), productRoutes);
+app.use('/api', productRoutes);
 app.use('/api', categoryRoutes);
 app.use('/api', cityRoutes);
 app.use('/api', shopRoutes);
