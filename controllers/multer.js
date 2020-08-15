@@ -28,5 +28,13 @@ var storage = multer.diskStorage({
   }
 });
 
-exports.uploadCsv = multer({ storage });
+const csvFileFilter = (req, file, cb) => {
+  if (file.mimetype === 'text/csv') {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+
+exports.uploadCsv = multer({ storage, fileFilter: csvFileFilter });
 exports.upload = multer({ storage: fileStorage, limits: { fileSize: 10000000 }, fileFilter: fileFilter });
