@@ -18,4 +18,15 @@ const fileFilter = (req, file, cb) => {
     cb(null, false);
   }
 };
+
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './csvFiles');
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.fieldname + '-' + Date.now());
+  }
+});
+
+exports.uploadCsv = multer({ storage });
 exports.upload = multer({ storage: fileStorage, limits: { fileSize: 10000000 }, fileFilter: fileFilter });

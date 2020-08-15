@@ -13,6 +13,9 @@ const productSchema = new mongoose.Schema(
       ref: 'Shop',
       required: true
     },
+    inShopId: {
+      type: String
+    },
     shopName: {
       type: String,
       required: true

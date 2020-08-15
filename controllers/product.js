@@ -1,3 +1,4 @@
+const csv = require('csvtojson');
 const fs = require('fs');
 const path = require('path');
 const mongoose = require('mongoose');
@@ -5,6 +6,50 @@ const { ObjectId } = mongoose.Schema;
 
 const { validationResult, check } = require('express-validator');
 const Product = require('../models/product');
+
+exports.imageUpload = (req, res, next) => {
+  const filePathArray = [];
+  req.files.forEach(file => {
+    filePathArray.push(file.path);
+  });
+  res.send(filePathArray);
+};
+
+exports.csvToJson = async (req, res, next) => {
+  const csvFilePath = `${req.file.destination}/${req.file.filename}`;
+
+  await csv({
+    noheader: false,
+    headers: ['inShopId', 'name', 'markedPrice', 'price', 'description', 'stock', 'category', 'photos']
+  })
+    .fromFile(csvFilePath)
+    .then(jsonArray => {
+      for (element of jsonArray) {
+        const photos = [];
+
+        element.photos.split(',').forEach(path => {
+          photos.push(path.trim());
+        });
+        element.shopName = req.body.shopName;
+        element.city = '5eff8e76d75ecb3735b243b1';
+        element.shopId = req.body.shopId;
+
+        element.photos = photos;
+      }
+      Product.insertMany(jsonArray);
+      console.log(jsonArray);
+      res.send(
+        JSON.stringify({
+          message: 'Uploaded products successfully',
+          products: jsonArray
+        })
+      );
+    });
+  fs.unlink(path.join(__dirname, '..', req.file.destination, req.file.filename), err => {
+    if (err) console.log(err);
+    else console.log('success');
+  });
+};
 
 exports.createProduct = (req, res, next) => {
   console.log(req.body);
