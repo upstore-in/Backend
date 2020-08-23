@@ -17,8 +17,8 @@ router.get('/products/:categoryId/:cityId', getProducts);
 router.get('/product/:productId', getProduct);
 router.get('/products/:shopId', productsOfShop);
 router.get('/search/products/:cityId', listBySearch);
-router.post('/images/upload', isSignedIn, isAuthenticated, isAdmin, upload.array('images'), imageUpload);
-router.post('/products/bulkUpload', isSignedIn, isAuthenticated, isAdmin, uploadCsv.single('csvFile'), csvToJson);
+router.post('/images/upload/:userId', isSignedIn, isAuthenticated, isAdmin, upload.array('images'), imageUpload);
+router.post('/products/bulkUpload/:userId', isSignedIn, isAuthenticated, isAdmin, uploadCsv.single('csvFile'), csvToJson);
 
 // Update Product
 router.put('/product/update/:productId/:userId', isSignedIn, isAuthenticated, isAdmin, upload.array('images', 8), updateProduct);
