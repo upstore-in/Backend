@@ -184,6 +184,7 @@ exports.signinEmail = (req, res) => {
 
 exports.signout = (req, res) => {
   res.clearCookie('token');
+  console.log('signed out');
   res.json({
     message: 'User signout successfully'
   });

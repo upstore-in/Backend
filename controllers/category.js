@@ -1,6 +1,7 @@
 const Category = require('../models/category');
 
 exports.getCategories = (req, res, next) => {
+  console.log('requested');
   Category.find()
     .exec()
     .then(docs => {

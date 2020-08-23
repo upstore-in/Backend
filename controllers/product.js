@@ -8,6 +8,7 @@ const { validationResult, check } = require('express-validator');
 const Product = require('../models/product');
 
 exports.imageUpload = (req, res, next) => {
+  console.log(req.files);
   const filePathArray = [];
   req.files.forEach(file => {
     filePathArray.push(file.path);
