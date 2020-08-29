@@ -19,7 +19,25 @@ const OrderSchema = new mongoose.Schema(
     products: [ProductCartSchema],
     transaction_id: {},
     amount: { type: Number },
-    address: String,
+    address: {
+      contactName: {
+        type: String,
+        maxlength: 32,
+        trim: true
+      },
+      contactNumber: {
+        type: Number,
+        trim: true
+      },
+      address: {
+        type: String,
+        trim: true
+      },
+      default: {
+        type: Boolean,
+        default: false
+      }
+    },
     status: {
       type: String,
       default: 'Recieved',

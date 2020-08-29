@@ -21,7 +21,7 @@ exports.csvToJson = async (req, res, next) => {
 
   await csv({
     noheader: false,
-    headers: ['inShopId', 'name', 'markedPrice', 'price', 'description', 'stock', 'category', 'photos']
+    headers: ['inShopId', 'name', 'markedPrice', 'price', 'description', 'stock', 'category', 'photos', 'searchIndex']
   })
     .fromFile(csvFilePath)
     .then(jsonArray => {
@@ -54,7 +54,7 @@ exports.csvToJson = async (req, res, next) => {
 
 exports.createProduct = (req, res, next) => {
   console.log(req.body);
-  const { name, shopName, description, price, stock, category, sold, city, shopId, markedPrice, size } = req.body;
+  const { name, shopName, description, price, stock, category, sold, city, shopId, markedPrice, size, searchIndex } = req.body;
   let photos = [];
   let i = 0;
   while (i < req.files.length) {
@@ -74,7 +74,8 @@ exports.createProduct = (req, res, next) => {
     photos,
     shopId,
     size,
-    markedPrice
+    markedPrice,
+    searchIndex
   });
   product
     .save()
@@ -362,6 +363,7 @@ exports.listBySearch = async (req, res) => {
 
   if (req.query.search) {
     query.name = { $regex: req.query.search, $options: 'i' };
+    // query.searchIndex = { $regex: req.query.search, $options: 'i' };
     query.city = req.params.cityId;
 
     await Product.countDocuments(query, function (err, result) {

@@ -20,6 +20,9 @@ const productSchema = new mongoose.Schema(
       type: String,
       required: true
     },
+    searchIndex: {
+      type: String
+    },
     description: {
       type: String,
       trim: true,
