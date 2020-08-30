@@ -38,6 +38,7 @@ exports.updateUser = (req, res) => {
 exports.userPurchaseList = (req, res) => {
   console.log(req.profile._id);
   Order.find({ user: req.profile._id })
+    .sort({ _id: -1 })
     .populate('User', '_id name')
     .populate('products.product', '-description -sold -createdAt -updatedAt -__v')
     .exec((err, order) => {

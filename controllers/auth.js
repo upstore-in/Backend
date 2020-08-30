@@ -59,7 +59,6 @@ exports.verifyOTP = (req, res, next) => {
 
       // The whole response has been received. Print out the result.
       resp.on('end', () => {
-        console.log(data);
         console.log(JSON.parse(data));
 
         const { Details, Status } = JSON.parse(data);
@@ -105,7 +104,7 @@ exports.verifyOTP = (req, res, next) => {
             }
           });
         } else if (Details === 'OTP Mismatch') {
-          return res.send('Incorrect OTP entered');
+          return res.json({ error: 'Incorrect OTP entered' });
         } else {
           res.send(`Error Occurred. Details:${Details}`);
         }

@@ -246,6 +246,7 @@ exports.getProducts = async (req, res, next) => {
 
     Product.find({ city, category })
       .skip((currentPage - 1) * perPage)
+      .sort({ _id: -1 })
       .limit(perPage)
       .select('name price photos size markedPrice shopName description')
       .exec()
