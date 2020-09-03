@@ -119,16 +119,16 @@ exports.getShops = async (req, res, next) => {
     const categories = mongoose.Types.ObjectId(req.params.categoryId);
     // PAGINATION (30 SHOPS PER PAGE)
     const currentPage = req.query.page || 1;
-    const perPage = 30;
+    const perPage = 10;
     let totalItems;
-    await Shop.countDocuments({ cityId, categories }, function (err, result) {
+    await Shop.countDocuments({ cityId, categories: { $in: [categories] } }, function (err, result) {
       if (err) {
         console.log(err);
       } else {
         totalItems = result;
       }
     });
-    Shop.find({ cityId })
+    Shop.find({ cityId, categories: { $in: [categories] } })
       .skip((currentPage - 1) * perPage)
       .limit(perPage)
       .select('name description banner city')
@@ -141,6 +141,7 @@ exports.getShops = async (req, res, next) => {
               name: doc.name,
               city: doc.city,
               banner: doc.banner,
+              description: doc.description,
               _id: doc._id,
               request: {
                 type: 'GET',

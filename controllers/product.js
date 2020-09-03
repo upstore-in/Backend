@@ -302,7 +302,7 @@ exports.updateStock = (req, res, next) => {
         error: 'Bulk operation failed'
       });
     }
-    console.log(products);
+
     next();
   });
 };

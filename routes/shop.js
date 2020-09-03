@@ -15,6 +15,8 @@ router.post('/shop/add/:userId', isSignedIn, isAuthenticated, isAdmin, upload.ar
 // Update Shop Details
 router.put('/shop/update/:userId/:shopId', isSignedIn, isAuthenticated, isAdmin, upload.array('images', 4), updateShop);
 router.get('/shops/:categoryId/:cityId', getShops);
+
 router.get('/shop/products/:shopId', productsOfShop);
+router.get('/shop/:shopId', getShop);
 
 module.exports = router;
