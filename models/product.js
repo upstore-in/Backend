@@ -51,6 +51,25 @@ const productSchema = new mongoose.Schema(
         type: String
       }
     ],
+    variants: [
+      {
+        size: {
+          type: String
+        },
+        color: {
+          type: String
+        },
+        product: {
+          type: ObjectId,
+          required: true,
+          ref: 'Product'
+        },
+        parent: {
+          type: Boolean,
+          default: false
+        }
+      }
+    ],
     city: {
       type: ObjectId,
       ref: 'City',

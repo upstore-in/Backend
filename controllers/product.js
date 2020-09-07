@@ -34,11 +34,37 @@ exports.csvToJson = async (req, res, next) => {
         element.shopName = req.body.shopName;
         element.city = '5eff8e76d75ecb3735b243b1';
         element.shopId = req.body.shopId;
-
+        element._id = mongoose.Types.ObjectId();
+        console.log(element._id);
         element.photos = photos;
       }
-      Product.insertMany(jsonArray);
-      console.log(jsonArray);
+
+      for (element of jsonArray) {
+        if (element.inShopId.split('$').length > 1) {
+          const products = jsonArray.filter(doc => doc.inShopId.split('$')[0] === element.inShopId.split('$')[0]);
+
+          const variants = [];
+          for (product of products) {
+            const variant = {};
+
+            variant.product = product._id;
+            variant.size = product.inShopId.split('$')[1];
+            variant.color = product.inShopId.split('$')[2];
+
+            variants.push(variant);
+          }
+          products.forEach(product => {
+            product.inShopId = product.inShopId.split('$')[0];
+            product.variants = variants;
+          });
+        }
+      }
+
+      Product.insertMany(jsonArray, (err, docs) => {
+        if (err) console.log(err);
+        console.log(docs);
+      });
+
       res.send(
         JSON.stringify({
           message: 'Uploaded products successfully',
