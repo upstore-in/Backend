@@ -10,9 +10,8 @@ exports.addToCart = async (req, res) => {
         let quantity = prod.quantity;
         // Cart already exists for user and he/she wants to add product to Cart or wishlist
         let itemIndex = cart.products.findIndex(doc => doc.product == product);
-        console.log(cart.products.findIndex(doc => doc.product == product));
+
         if (itemIndex > -1) {
-          console.log(itemIndex);
           //Product exists in the cart, update the quantity and/or wishlist status
           let productItem = cart.products[itemIndex];
           productItem.quantity = wishlist ? 1 : quantity;
@@ -27,7 +26,6 @@ exports.addToCart = async (req, res) => {
       cart
         .save()
         .then(cart => {
-          console.log(cart);
           Cart.findOne({ userId })
             .populate('products.product', '-description -sold -createdAt -updatedAt -__v')
             .exec((err, cart) => {
@@ -53,7 +51,6 @@ exports.addToCart = async (req, res) => {
         products
       })
         .then(newCart => {
-          console.log(newCart);
           Cart.findOne({ userId })
             .populate('products.product', '-description -sold -createdAt -updatedAt -__v')
             .exec((err, cart) => {
@@ -89,11 +86,9 @@ exports.getCart = async (req, res) => {
             error: 'NO cart found in DB'
           });
         } else if (!cart) {
-          console.log(cart);
           return res.status(200).json([]);
         } else {
           cart.products.forEach(product => {
-            console.log(product.wishlist);
             product.wishlist == wishlist ? newProducts.push(product) : '';
           });
           return res.status(201).send(newProducts);
@@ -114,7 +109,7 @@ exports.removeFromCart = async (req, res) => {
   try {
     if (cart) {
       let itemIndex = await cart.products.findIndex(doc => doc.product == product);
-      console.log(itemIndex);
+
       if (itemIndex !== -1) cart.products.splice(itemIndex, 1);
 
       cart

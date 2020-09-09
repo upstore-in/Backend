@@ -48,6 +48,14 @@ const shopSchema = new mongoose.Schema(
       type: ObjectId,
       ref: 'City',
       required: true
+    },
+    contact: {
+      number: {
+        type: Number
+      },
+      email: {
+        type: String
+      }
     }
   },
   { timestamps: true }

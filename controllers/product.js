@@ -274,7 +274,7 @@ exports.getProducts = async (req, res, next) => {
       .skip((currentPage - 1) * perPage)
       .sort({ _id: -1 })
       .limit(perPage)
-      .select('name price photos size markedPrice shopName description')
+      .select('name price photos size markedPrice shopName description ')
       .exec()
       .then(docs => {
         const response = {
@@ -289,6 +289,7 @@ exports.getProducts = async (req, res, next) => {
               description: doc.description,
               markedPrice: doc.markedPrice,
               _id: doc._id,
+
               request: {
                 type: 'GET',
                 url: 'http://159.65.159.82:8000/api/product/' + doc._id
@@ -383,15 +384,22 @@ exports.productsOfShop = async (req, res, next) => {
 };
 
 exports.listBySearch = async (req, res) => {
-  const query = {};
   const currentPage = req.query.page || 1;
   const perPage = 10;
   let totalCount;
 
   if (req.query.search) {
-    query.name = { $regex: req.query.search, $options: 'i' };
-    // query.searchIndex = { $regex: req.query.search, $options: 'i' };
-    query.city = req.params.cityId;
+    console.log(req.query.search);
+    let str = '';
+
+    req.query.search.split(' ').forEach(word => {
+      str += word + '|';
+    });
+
+    const query = {
+      $or: [{ name: { $regex: str + req.query.search, $options: 'i' } }, { searchIndex: { $regex: str + req.query.search, $options: 'i' } }],
+      city: req.params.cityId
+    };
 
     await Product.countDocuments(query, function (err, result) {
       if (err) {
@@ -454,3 +462,7 @@ exports.listBySearch = async (req, res) => {
 //     });
 //   //}
 // };
+
+function escapeRegex(text) {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+}

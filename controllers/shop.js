@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 
 exports.addShop = (req, res, next) => {
   console.log(req.body);
-  const { name, description, owner, address, products, categories, city, cityId } = req.body;
+  const { name, description, owner, address, products, categories, city, cityId, contact } = req.body;
   let banner;
   banner = req.files[0].path;
   console.log(banner);
@@ -19,7 +19,8 @@ exports.addShop = (req, res, next) => {
     banner,
     categories,
     city,
-    cityId
+    cityId,
+    contact
   });
   shop
     .save()
@@ -53,8 +54,9 @@ exports.updateShop = (req, res, next) => {
     error.statusCode = 422;
     throw error;
   }
-  const { name, description, owner, address, products, categories, city, cityId } = req.body;
-  if (req.files[0].path) {
+  const { name, description, owner, address, products, categories, city, cityId, contact } = req.body;
+  const udateArr = [name, description, owner, address, products, categories, city, cityId, contact];
+  if (req.files.length) {
     // update banner
     banner = req.files[0].path;
 
@@ -76,8 +78,19 @@ exports.updateShop = (req, res, next) => {
     city,
     banner,
     cityId,
-    banner
+    banner,
+    contact
   };
+
+  console.log(update);
+
+  for (key in update) {
+    if (update[key] === undefined) {
+      delete update[key];
+    }
+  }
+
+  console.log(update);
 
   Shop.findOneAndUpdate({ _id: shopId }, { $set: update }, { new: true }, (err, document) => {
     if (err) {
