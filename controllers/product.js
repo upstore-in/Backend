@@ -274,7 +274,7 @@ exports.getProducts = async (req, res, next) => {
       .skip((currentPage - 1) * perPage)
       .sort({ _id: -1 })
       .limit(perPage)
-      .select('name price photos size markedPrice shopName description ')
+      .select('name price photos size markedPrice shopName description variants')
       .exec()
       .then(docs => {
         const response = {
@@ -289,6 +289,7 @@ exports.getProducts = async (req, res, next) => {
               description: doc.description,
               markedPrice: doc.markedPrice,
               _id: doc._id,
+              variants: doc.variants,
 
               request: {
                 type: 'GET',

@@ -109,6 +109,7 @@ exports.createOrder = async (req, res) => {
 exports.getAllOrders = (req, res) => {
   Order.find({})
     .populate('user', '_id name')
+    .sort({ _id: -1 })
     // .populate('products.product')
     .exec((err, order) => {
       if (err) {

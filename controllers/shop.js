@@ -144,7 +144,7 @@ exports.getShops = async (req, res, next) => {
     Shop.find({ cityId, categories: { $in: [categories] } })
       .skip((currentPage - 1) * perPage)
       .limit(perPage)
-      .select('name description banner city')
+      .select('name description banner city ')
       .exec()
       .then(docs => {
         const response = {
