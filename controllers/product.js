@@ -354,7 +354,7 @@ exports.productsOfShop = async (req, res, next) => {
   Product.find({ shopId })
     .skip((currentPage - 1) * perPage)
     .limit(perPage)
-    .select('name price photos markedPrice size')
+    .select('name price photos markedPrice size variants')
     .exec()
     .then(docs => {
       const response = {
@@ -367,6 +367,7 @@ exports.productsOfShop = async (req, res, next) => {
             markedPrice: doc.markedPrice,
             size: doc.size,
             _id: doc._id,
+            variants: doc.variants,
             request: {
               type: 'GET',
               url: 'http://159.65.159.82:8000/api/product/' + doc._id
