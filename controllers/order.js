@@ -73,7 +73,7 @@ exports.createOrder = async (req, res) => {
     fd.append('From', 'UPSTOR');
     fd.append('To', `${contactNumbers[index]}`);
     fd.append('TemplateName', 'informShopkeeper');
-    fd.append('VAR1', order.transaction_id);
+    fd.append('VAR1', `${order.transaction_id} Customer:${order.user.phoneNumber}`);
     fd.append('VAR2', VAR2);
 
     console.log(VAR2);
