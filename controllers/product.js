@@ -274,7 +274,8 @@ exports.getProducts = async (req, res, next) => {
       .skip((currentPage - 1) * perPage)
       .sort({ _id: -1 })
       .limit(perPage)
-      .select('name price photos size markedPrice shopName description variants')
+      .populate('shopId', 'open')
+      .select('name price photos markedPrice shopName  variants stock')
       .exec()
       .then(docs => {
         const response = {
@@ -286,7 +287,8 @@ exports.getProducts = async (req, res, next) => {
               shopName: doc.shopName,
               photos: doc.photos,
               size: doc.size,
-              description: doc.description,
+              stock: doc.stock,
+              open: doc.shopId.open,
               markedPrice: doc.markedPrice,
               _id: doc._id,
               variants: doc.variants,
@@ -353,8 +355,9 @@ exports.productsOfShop = async (req, res, next) => {
 
   Product.find({ shopId })
     .skip((currentPage - 1) * perPage)
+    .populate('shopId', 'open')
     .limit(perPage)
-    .select('name price photos markedPrice size variants')
+    .select('name price photos markedPrice  variants stock')
     .exec()
     .then(docs => {
       const response = {
@@ -365,8 +368,11 @@ exports.productsOfShop = async (req, res, next) => {
             price: doc.price,
             photos: doc.photos,
             markedPrice: doc.markedPrice,
-            size: doc.size,
+
             _id: doc._id,
+            stock: doc.stock,
+            open: doc.shopId.open,
+            open: doc.shopId.open,
             variants: doc.variants,
             request: {
               type: 'GET',
@@ -412,10 +418,34 @@ exports.listBySearch = async (req, res) => {
     });
 
     Product.find(query)
+      .populate('shopId', 'open')
+      .select('name  price photos markedPrice _id open variants shopName stock shopId')
       .skip((currentPage - 1) * perPage)
       .limit(perPage)
-      .then(products => {
-        return res.status(200).send({ totalCount, products });
+      .then(docs => {
+        return res.status(200).send({
+          totalCount,
+
+          products: docs.map(doc => {
+            console.log(doc);
+            return {
+              name: doc.name,
+              price: doc.price,
+              photos: doc.photos,
+              markedPrice: doc.markedPrice,
+              shopName: doc.shopName,
+              stock: doc.stock,
+              size: doc.size,
+              _id: doc._id,
+              open: doc.shopId.open,
+              variants: doc.variants,
+              request: {
+                type: 'GET',
+                url: 'http://159.65.159.82:8000/api/product/' + doc._id
+              }
+            };
+          })
+        });
       });
   } else {
     return res.status(400).send('Search query cannot be empty');

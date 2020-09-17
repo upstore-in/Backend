@@ -144,7 +144,7 @@ exports.getShops = async (req, res, next) => {
     Shop.find({ cityId, categories: { $in: [categories] } })
       .skip((currentPage - 1) * perPage)
       .limit(perPage)
-      .select('name description banner city ')
+      .select('name description banner city open')
       .exec()
       .then(docs => {
         const response = {
@@ -156,6 +156,7 @@ exports.getShops = async (req, res, next) => {
               banner: doc.banner,
               description: doc.description,
               _id: doc._id,
+              open: doc.open,
               request: {
                 type: 'GET',
                 url: 'http://localhost:8000/api/shop/' + doc._id

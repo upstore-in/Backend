@@ -39,6 +39,10 @@ const shopSchema = new mongoose.Schema(
         ref: 'Category'
       }
     ],
+    open: {
+      type: Boolean,
+      default: false
+    },
     city: {
       type: String,
       required: true,
