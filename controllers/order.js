@@ -108,7 +108,7 @@ exports.createOrder = async (req, res) => {
 
 exports.getAllOrders = (req, res) => {
   Order.find({})
-    .populate('products.product', 'shopName shopId')
+    .populate('products.product', 'shopName shopId variants')
     .populate('user', '_id name')
 
     .sort({ _id: -1 })
