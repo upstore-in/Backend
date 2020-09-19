@@ -58,7 +58,7 @@ exports.createOrder = async (req, res) => {
   );
 
   let productsOfShop = [];
-  shopIds.forEach((shopId, index, arr) => {
+  shopIds.forEach((shopId, index) => {
     productsOfShop = products.filter(product => {
       return product.shopId.toString() === shopId;
     });
