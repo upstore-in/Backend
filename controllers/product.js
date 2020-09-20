@@ -315,27 +315,27 @@ exports.getProducts = async (req, res, next) => {
 };
 
 exports.updateStock = (req, res, next) => {
-  // let myOperations = req.body.order.products.map(prod => {
-  //   console.log(prod.quantity);
+  let myOperations = req.body.order.products.map(prod => {
+    console.log(prod.quantity);
 
-  //   return {
-  //     updateOne: {
-  //       filter: { _id: prod.product },
-  //       update: { $inc: { stock: -prod.quantity, sold: +prod.quantity } }
-  //     }
-  //   };
-  // });
+    return {
+      updateOne: {
+        filter: { _id: prod.product },
+        update: { $inc: { stock: -prod.quantity, sold: +prod.quantity } }
+      }
+    };
+  });
 
-  // Product.bulkWrite(myOperations, {}, (err, products) => {
-  //   if (err) {
-  //     console.log(err);
-  //     return res.status(400).json({
-  //       error: 'Bulk operation failed'
-  //     });
-  //   }
+  Product.bulkWrite(myOperations, {}, (err, products) => {
+    if (err) {
+      console.log(err);
+      return res.status(400).json({
+        error: 'Bulk operation failed'
+      });
+    }
 
-  next();
-  // });
+    next();
+  });
 };
 
 exports.productsOfShop = async (req, res, next) => {
