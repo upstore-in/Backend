@@ -95,7 +95,7 @@ exports.createOrder = async (req, res) => {
   fd.append('TemplateName', 'Confirmation Msg');
   fd.append('VAR1', VAR1);
   fd.append('VAR2', order.transaction_id);
-  console.log(order);
+
   axios
     .post(`https://2factor.in/API/V1/${process.env.OTPAPIKEY}/ADDON_SERVICES/SEND/TSMS`, fd, { headers: fd.getHeaders() })
     .then(res => {
@@ -119,8 +119,6 @@ exports.getAllOrders = (req, res) => {
           error: 'No orders found in DB'
         });
       }
-
-      console.log(order);
 
       res.json(order);
     });
