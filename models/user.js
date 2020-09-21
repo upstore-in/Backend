@@ -68,10 +68,18 @@ var userSchema = new mongoose.Schema(
       type: Number,
       default: 0
     },
-    shopId: {
-      type: ObjectId,
-      ref: 'Shop'
-    },
+    shopIds: [
+      {
+        shopId: {
+          type: ObjectId,
+          ref: 'Shop'
+        },
+        shopName: {
+          type: String
+        },
+        category: { type: ObjectId, ref: 'Category' }
+      }
+    ],
     purchases: {
       type: Array,
       default: []

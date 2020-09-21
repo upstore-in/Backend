@@ -6,6 +6,10 @@ const ProductCartSchema = new mongoose.Schema({
     type: ObjectId,
     ref: 'Product'
   },
+  shopId: {
+    type: ObjectId,
+    ref: 'Shop'
+  },
   name: String,
   quantity: Number,
   price: Number,

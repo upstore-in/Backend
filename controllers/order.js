@@ -77,14 +77,14 @@ exports.createOrder = async (req, res) => {
     fd.append('VAR2', VAR2);
 
     console.log(VAR2);
-    axios
-      .post(`https://2factor.in/API/V1/${process.env.OTPAPIKEY}/ADDON_SERVICES/SEND/TSMS`, fd, { headers: fd.getHeaders() })
-      .then(res => {
-        console.log(`statusCode: ${res.statusCode}`);
-      })
-      .catch(error => {
-        console.error(error);
-      });
+    // axios
+    //   .post(`https://2factor.in/API/V1/${process.env.OTPAPIKEY}/ADDON_SERVICES/SEND/TSMS`, fd, { headers: fd.getHeaders() })
+    //   .then(res => {
+    //     console.log(`statusCode: ${res.statusCode}`);
+    //   })
+    //   .catch(error => {
+    //     console.error(error);
+    //   });
   });
 
   const VAR1 = `${order.products[0].name} ${order.products.length > 1 ? `and ${order.products.length - 1} more items` : ''}`;
@@ -96,14 +96,14 @@ exports.createOrder = async (req, res) => {
   fd.append('VAR1', VAR1);
   fd.append('VAR2', order.transaction_id);
 
-  axios
-    .post(`https://2factor.in/API/V1/${process.env.OTPAPIKEY}/ADDON_SERVICES/SEND/TSMS`, fd, { headers: fd.getHeaders() })
-    .then(res => {
-      console.log(`statusCode: ${res.statusCode}`);
-    })
-    .catch(error => {
-      console.error(error);
-    });
+  // axios
+  //   .post(`https://2factor.in/API/V1/${process.env.OTPAPIKEY}/ADDON_SERVICES/SEND/TSMS`, fd, { headers: fd.getHeaders() })
+  //   .then(res => {
+  //     console.log(`statusCode: ${res.statusCode}`);
+  //   })
+  //   .catch(error => {
+  //     console.error(error);
+  //   });
 };
 
 exports.getAllOrders = (req, res) => {
@@ -121,6 +121,39 @@ exports.getAllOrders = (req, res) => {
       }
 
       res.json(order);
+    });
+};
+
+exports.getShopOrders = async (req, res) => {
+  const currentPage = req.query.page || 1;
+  const perPage = 10;
+  let totalItems;
+
+  await Order.countDocuments({ 'products.shopId': req.params.shopId }, function (err, result) {
+    if (err) {
+      console.log(err);
+    } else {
+      totalItems = result;
+    }
+  });
+
+  Order.find({ 'products.shopId': req.params.shopId, status: 'Recieved' })
+    .skip((currentPage - 1) * perPage)
+    .sort({ _id: -1 })
+    .limit(perPage)
+    .then(docs => {
+      const response = {
+        totalCount: totalItems,
+        orders: docs.map(document => {
+          console.log(document);
+          return {
+            _id: document._id,
+            transaction_id: document.transaction_id,
+            products: document.products.filter(doc => doc.shopId.toString() === req.params.shopId)
+          };
+        })
+      };
+      res.status(200).json(response);
     });
 };
 

@@ -258,7 +258,7 @@ exports.getProducts = async (req, res, next) => {
     const city = req.params.cityId;
     const category = req.params.categoryId;
 
-    // PAGINATION (30 PRODUCTS PER PAGE)
+    // PAGINATION (10 PRODUCTS PER PAGE)
     const currentPage = req.query.page || 1;
     const perPage = 10;
     let totalItems;
@@ -357,6 +357,7 @@ exports.productsOfShop = async (req, res, next) => {
   Product.find({ shopId })
     .skip((currentPage - 1) * perPage)
     .populate('shopId', 'open')
+    .sort({ _id: -1 })
     .limit(perPage)
     .select('name price photos markedPrice  variants stock')
     .exec()

@@ -88,9 +88,10 @@ exports.getCart = async (req, res) => {
         } else if (!cart) {
           return res.status(200).json([]);
         } else {
-          cart.products.forEach(product => {
-            product.wishlist == wishlist ? newProducts.push(product) : '';
+          cart.products.forEach((document, index, cart) => {
+            document.wishlist == wishlist ? newProducts.push(document) : '';
           });
+
           return res.status(201).send(newProducts);
         }
       });
