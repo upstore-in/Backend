@@ -78,6 +78,23 @@ exports.csvToJson = async (req, res, next) => {
   });
 };
 
+exports.addProductWithVariant = (req, res, next) => {
+  req.body.forEach(element => {
+    const photos = [];
+
+    element.images.split(',').forEach(path => {
+      photos.push(path.trim());
+    });
+    element.shopName = element.shopName;
+    element.city = element.city;
+    element.shopId = element.shopId;
+    element._id = mongoose.Types.ObjectId();
+    console.log(element._id);
+    element.photos = photos;
+  });
+  console.log(req.body);
+};
+
 exports.createProduct = (req, res, next) => {
   console.log(req.body);
   const { name, shopName, description, price, stock, category, sold, city, shopId, markedPrice, size, searchIndex } = req.body;
@@ -260,7 +277,7 @@ exports.getProducts = async (req, res, next) => {
 
     // PAGINATION (10 PRODUCTS PER PAGE)
     const currentPage = req.query.page || 1;
-    const perPage = 10;
+    const perPage = 30;
     let totalItems;
 
     await Product.countDocuments({ city, category }, function (err, result) {
@@ -343,7 +360,7 @@ exports.productsOfShop = async (req, res, next) => {
 
   // PAGINATION (30 PRODUCTS PER PAGE)
   const currentPage = req.query.page || 1;
-  const perPage = 10;
+  const perPage = 30;
   let totalItems;
 
   await Product.countDocuments({ shopId }, function (err, result) {
@@ -395,7 +412,7 @@ exports.productsOfShop = async (req, res, next) => {
 
 exports.listBySearch = async (req, res) => {
   const currentPage = req.query.page || 1;
-  const perPage = 10;
+  const perPage = 30;
   let totalCount;
 
   if (req.query.search) {
