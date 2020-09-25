@@ -1,4 +1,6 @@
 const Cart = require('../models/wishlistAndCart');
+const mongoose = require('mongoose');
+const { ObjectId } = mongoose.Schema;
 
 exports.addToCart = async (req, res) => {
   const { products, userId } = req.body;
@@ -152,4 +154,25 @@ exports.clearCart = async (req, res, next) => {
       return res.status(404).send('Something went wrong');
     };
   }
+};
+
+exports.checkAndDelete = async (req, res, next) => {
+  // let carts = await Cart.find({}).select('products _id').populate('products.product');
+  // await carts.forEach(cart => {
+  //   cart.products.forEach((doc, index, products) => {
+  //     if (products.length) {
+  //       if (doc.product === null) {
+  //         console.log('null');
+  //         products.splice(index, 1);
+  //       } else {
+  //         console.log('product');
+  //       }
+  //     }
+  //   });
+  // });
+  // Cart.deleteMany({}).then(res => {
+  //   Cart.insertMany(carts);
+  //   console.log(carts);
+  // });
+  // res.json(carts);
 };

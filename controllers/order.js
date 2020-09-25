@@ -96,14 +96,14 @@ exports.createOrder = async (req, res) => {
   fd.append('VAR1', VAR1);
   fd.append('VAR2', order.transaction_id);
 
-  // axios
-  //   .post(`https://2factor.in/API/V1/${process.env.OTPAPIKEY}/ADDON_SERVICES/SEND/TSMS`, fd, { headers: fd.getHeaders() })
-  //   .then(res => {
-  //     console.log(`statusCode: ${res.statusCode}`);
-  //   })
-  //   .catch(error => {
-  //     console.error(error);
-  //   });
+  axios
+    .post(`https://2factor.in/API/V1/${process.env.OTPAPIKEY}/ADDON_SERVICES/SEND/TSMS`, fd, { headers: fd.getHeaders() })
+    .then(res => {
+      console.log(`statusCode: ${res.statusCode}`);
+    })
+    .catch(error => {
+      console.error(error);
+    });
 };
 
 exports.getAllOrders = (req, res) => {
