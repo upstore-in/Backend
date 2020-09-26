@@ -417,14 +417,14 @@ exports.listBySearch = async (req, res) => {
 
   if (req.query.search) {
     console.log(req.query.search);
-    let str = '';
+    // let str = '';
 
-    req.query.search.split(' ').forEach(word => {
-      str += word + '|';
-    });
+    // req.query.search.split(' ').forEach(word => {
+    //   str += word + '|';
+    // });
 
     const query = {
-      $or: [{ name: { $regex: str + req.query.search, $options: 'i' } }, { searchIndex: { $regex: str + req.query.search, $options: 'i' } }],
+      $or: [{ name: { $regex: req.query.search, $options: 'i' } }, { searchIndex: { $regex: req.query.search, $options: 'i' } }],
       city: req.params.cityId
     };
 
