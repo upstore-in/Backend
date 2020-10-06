@@ -16,6 +16,41 @@ exports.imageUpload = (req, res, next) => {
   res.send(filePathArray);
 };
 
+exports.addProductWithVariant = (req, res, next) => {
+  const variants = [];
+
+  req.body.forEach(element => {
+    const photos = [];
+
+    element.photos.split(',').forEach(path => {
+      photos.push(path.trim());
+    });
+    element.shopName = element.shopName;
+    element.city = element.city;
+    element.shopId = element.shopId;
+    element._id = mongoose.Types.ObjectId();
+    console.log(element._id);
+    element.photos = photos;
+
+    variants.push({ product: element._id, size: element.size, color: element.color });
+    delete element.size;
+    delete element.color;
+  });
+  req.body.forEach(element => (element.variants = variants));
+
+  Product.insertMany(req.body, (err, docs) => {
+    if (err) console.log(err);
+    console.log(docs);
+  });
+
+  res.send(
+    JSON.stringify({
+      message: 'Uploaded products successfully'
+    })
+  );
+  console.log(variants);
+};
+
 exports.csvToJson = async (req, res, next) => {
   const csvFilePath = `${req.file.destination}/${req.file.filename}`;
 
@@ -76,23 +111,6 @@ exports.csvToJson = async (req, res, next) => {
     if (err) console.log(err);
     else console.log('success');
   });
-};
-
-exports.addProductWithVariant = (req, res, next) => {
-  req.body.forEach(element => {
-    const photos = [];
-
-    element.images.split(',').forEach(path => {
-      photos.push(path.trim());
-    });
-    element.shopName = element.shopName;
-    element.city = element.city;
-    element.shopId = element.shopId;
-    element._id = mongoose.Types.ObjectId();
-    console.log(element._id);
-    element.photos = photos;
-  });
-  console.log(req.body);
 };
 
 exports.createProduct = (req, res, next) => {
@@ -206,58 +224,33 @@ exports.updateProduct = (req, res, next) => {
     error.statusCode = 422;
     throw error;
   }
-  const { name, shopName, description, price, category, stock, sold, shopId, markedPrice, size } = req.body;
+  console.log(req.body);
+  Product.findById(productId).then(product => {
+    if (!product) {
+      const error = new Error('Could not find product.');
+      error.statusCode = 404;
+      throw error;
+    }
 
-  Product.findById(productId)
-    .then(product => {
-      if (!product) {
-        const error = new Error('Could not find product.');
-        error.statusCode = 404;
-        throw error;
+    if (req.files.length) {
+      let newPhotos = [];
+      let i = 0;
+      while (i < req.files.length) {
+        console.log(req.files[i].path);
+        newPhotos.push(req.files[i].path);
+        i++;
       }
-      const photos = product.photos;
-      const _id = product._id;
-      product.name = name;
-      product.shopName = shopName;
-      product.description = description;
-      product.price = price;
-      product.category = category;
-      product.stock = stock;
-      product.sold = sold;
-      product.shopId = shopId;
-      product.markedPrice = markedPrice;
-      console.log(product.markedPrice);
-      product.size = size;
-      console.log(product.size);
-      console.log(product);
-      console.log(req.files);
-      if (req.files) {
-        let newPhotos = [];
-        let i = 0;
-        while (i < req.files.length) {
-          console.log(req.files[i].path);
-          newPhotos.push(req.files[i].path);
-          i++;
-        }
-        //clear image from server
-        clearImages(photos);
+      //   //clear image from server
+      clearImages(product.photos);
 
-        // udate photos
-        product.photos = newPhotos;
-      }
+      // udate photos
+      req.body.photos = newPhotos;
+    }
 
-      product.save();
-    })
-    .then(result => {
-      res.status(200).json({ message: 'Product updated!', product: result });
-    })
-    .catch(err => {
-      if (!err.statusCode) {
-        err.statusCode = 500;
-      }
-      res.send('err ocurred');
-      // next(err);
-    });
+    Product.updateOne({ _id: productId }, { $set: req.body }, { new: true, useFindAndModify: false })
+      .then(result => res.send(result))
+      .catch(err => console.log(err));
+  });
 };
 
 const clearImages = filePathArray => {
@@ -376,7 +369,7 @@ exports.productsOfShop = async (req, res, next) => {
     .populate('shopId', 'open')
     .sort({ _id: -1 })
     .limit(perPage)
-    .select('name price photos markedPrice  variants stock')
+    .select('name price photos markedPrice  variants stock description')
     .exec()
     .then(docs => {
       const response = {
@@ -387,11 +380,11 @@ exports.productsOfShop = async (req, res, next) => {
             price: doc.price,
             photos: doc.photos,
             markedPrice: doc.markedPrice,
-
+            description: doc.description,
             _id: doc._id,
             stock: doc.stock,
             open: doc.shopId.open,
-            open: doc.shopId.open,
+
             variants: doc.variants,
             request: {
               type: 'GET',
