@@ -5,6 +5,7 @@ const { ObjectId } = mongoose.Schema;
 exports.addToCart = async (req, res) => {
   const { products, userId } = req.body;
   let cart = await Cart.findOne({ userId });
+
   try {
     if (cart) {
       products.forEach(prod => {
@@ -29,15 +30,41 @@ exports.addToCart = async (req, res) => {
         .save()
         .then(cart => {
           Cart.findOne({ userId })
-            .populate('products.product', '-description -sold -createdAt -updatedAt -__v')
-            .exec((err, cart) => {
+            .populate({ path: 'products.product', select: '-description -sold -createdAt -updatedAt -__v', populate: [{ path: 'shopId', select: 'open' }] })
+            .exec(async (err, cart) => {
               if (err) {
                 return res.status(400).json({
                   error: 'NO cart found in DB'
                 });
               }
+              const newProducts = cart.products.map(document => {
+                return {
+                  wishlist: document.wishlist,
+                  _id: document._id,
+                  quantity: document.quantity,
+                  product: {
+                    size: document.product.size,
+                    photos: document.product.photos,
+                    _id: document.product._id,
+                    name: document.product.name,
+                    markedPrice: document.product.markedPrice,
+                    price: document.product.price,
+                    stock: document.product.stock,
+                    category: document.product.category,
+                    shopName: document.product.shopName,
+                    city: document.product.city,
+                    shopId: document.product.shopId._id,
+                    variants: document.product.variants,
+                    open: document.product.shopId.open
+                  }
+                };
+              });
 
-              return res.status(201).send(cart);
+              return res.status(201).send({
+                _id: cart._id,
+                userId: cart.userId,
+                products: newProducts
+              });
             });
         })
         .catch(err => {
@@ -62,7 +89,34 @@ exports.addToCart = async (req, res) => {
                 });
               }
 
-              return res.status(201).send(cart);
+              const newProducts = cart.products.map(document => {
+                return {
+                  wishlist: document.wishlist,
+                  _id: document._id,
+                  quantity: document.quantity,
+                  product: {
+                    size: document.product.size,
+                    photos: document.product.photos,
+                    _id: document.product._id,
+                    name: document.product.name,
+                    markedPrice: document.product.markedPrice,
+                    price: document.product.price,
+                    stock: document.product.stock,
+                    category: document.product.category,
+                    shopName: document.product.shopName,
+                    city: document.product.city,
+                    shopId: document.product.shopId._id,
+                    variants: document.product.variants,
+                    open: document.product.shopId.open
+                  }
+                };
+              });
+
+              return res.status(201).send({
+                _id: cart._id,
+                userId: cart.userId,
+                products: newProducts
+              });
             });
         })
         .catch(err => {
