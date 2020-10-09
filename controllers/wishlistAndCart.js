@@ -81,7 +81,7 @@ exports.getCart = async (req, res) => {
   const wishlist = req.query.wishlist || 0;
   try {
     Cart.findOne({ userId })
-      .populate('products.product', '-description -sold -createdAt -updatedAt -__v')
+      .populate({ path: 'products.product', select: '-description -sold -createdAt -updatedAt -__v', populate: [{ path: 'shopId', select: 'open' }] })
       .exec((err, cart) => {
         if (err) {
           return res.status(400).json({
@@ -91,7 +91,28 @@ exports.getCart = async (req, res) => {
           return res.status(200).json([]);
         } else {
           cart.products.forEach((document, index, cart) => {
-            document.wishlist == wishlist ? newProducts.push(document) : '';
+            document.wishlist == wishlist
+              ? newProducts.push({
+                  wishlist: document.wishlist,
+                  _id: document._id,
+                  quantity: document.quantity,
+                  product: {
+                    size: document.product.size,
+                    photos: document.product.photos,
+                    _id: document.product._id,
+                    name: document.product.name,
+                    markedPrice: document.product.markedPrice,
+                    price: document.product.price,
+                    stock: document.product.stock,
+                    category: document.product.category,
+                    shopName: document.product.shopName,
+                    city: document.product.city,
+                    shopId: document.product.shopId._id,
+                    variants: document.product.variants,
+                    open: document.product.shopId.open
+                  }
+                })
+              : '';
           });
 
           return res.status(201).send(newProducts);

@@ -35,58 +35,6 @@ exports.createOrder = async (req, res) => {
     res.json(order);
   });
 
-  let shopIds = [];
-  let contactNumbers = [];
-  let products = [];
-  await Promise.all(
-    order.products.map(async doc => {
-      const product = await Product.findById(doc.product);
-      products.push(product);
-
-      shopIds.push(product.shopId.toString());
-    })
-  );
-
-  shopIds = Array.from(new Set(shopIds));
-
-  await Promise.all(
-    shopIds.map(async id => {
-      const shop = await Shop.findById(id);
-
-      contactNumbers.push(shop.contact.number);
-    })
-  );
-
-  let productsOfShop = [];
-  shopIds.forEach((shopId, index) => {
-    productsOfShop = products.filter(product => {
-      return product.shopId.toString() === shopId;
-    });
-    let VAR2 = '';
-    productsOfShop.forEach(product => {
-      const index = order.products.findIndex(doc => doc.product.toString() === product._id.toString());
-
-      VAR2 += `[ product: ${product.name}, price:${product.price}, ${product.inShopId ? `ID: ${product.inShopId},` : ''} quantity: ${order.products[index].quantity} ]`;
-    });
-
-    const fd = new FormData();
-    fd.append('From', 'UPSTOR');
-    fd.append('To', `${contactNumbers[index]}`);
-    fd.append('TemplateName', 'informShopkeeper');
-    fd.append('VAR1', `${order.transaction_id} Customer:${order.address.contactName}`);
-    fd.append('VAR2', VAR2);
-
-    console.log(VAR2);
-    // axios
-    //   .post(`https://2factor.in/API/V1/${process.env.OTPAPIKEY}/ADDON_SERVICES/SEND/TSMS`, fd, { headers: fd.getHeaders() })
-    //   .then(res => {
-    //     console.log(`statusCode: ${res.statusCode}`);
-    //   })
-    //   .catch(error => {
-    //     console.error(error);
-    //   });
-  });
-
   const VAR1 = `${order.products[0].name} ${order.products.length > 1 ? `and ${order.products.length - 1} more items` : ''}`;
 
   const fd = new FormData();
