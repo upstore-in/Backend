@@ -7,7 +7,7 @@ exports.addCity = (req, res, next) => {
     .then(result => {
       console.log(result);
       res.status(201).json({
-        message: 'City added successfully',
+        message: 'City added successfully!',
         addedCity: {
           name: result.name,
           _id: result._id

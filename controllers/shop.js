@@ -48,6 +48,7 @@ exports.addShop = (req, res, next) => {
 exports.updateShop = (req, res, next) => {
   let banner;
   const shopId = req.params.shopId;
+  console.log(shopId);
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const error = new Error('Validation failed, entered data is incorrect.');
